@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QTimer>
 #include <QVector>
+#include <QPixmap>
 
 class PlotWidget : public QWidget
 {
@@ -13,13 +14,16 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;  // regenerate grid when resized
 
 private slots:
     void updateData();
 
 private:
-    QVector<int> data; // stores y-values
+    QVector<int> data;    // stores y-values
     QTimer timer;
+    QPixmap background;   // cached grid
+    void generateGrid();  // draw grid once
 };
 
 #endif // PLOTWIDGET_H
