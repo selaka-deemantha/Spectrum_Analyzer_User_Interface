@@ -25,22 +25,30 @@ void MainWindow::onSpanButtonPressed(){
     NumPadDialog dlg(this);
     dlg.setTitle("Set Span");
     dlg.showFullScreen();
+    double span;
 
     if (dlg.exec() == QDialog::Accepted) {
-        double span = dlg.value();
+        span = dlg.value();
         // store span, update spectrum scaling later
         qDebug() << "Span set to:" << span;
     }
+
+    ui->span_label->setText(QString("%1 MHz").arg(span, 0, 'f', 3));
+    ui->rbw_label->setText(QString("%1 MHz").arg(span / 1e6, 0, 'f', 3));
+    ui->swt_label->setText(QString("%1 MHz").arg(span / 1e6, 0, 'f', 3));
+
 }
 
 void MainWindow::onCenterFreqButtonPressed()
 {
     NumPadDialog dlg(this);
     dlg.setTitle("Set Center Frequency");
+    double freq;
 
     if (dlg.exec() == QDialog::Accepted) {
-        double freq = dlg.value();
+        freq = dlg.value();
         // store center frequency
         qDebug() << "Center Frequency set to:" << freq;
     }
+    ui->center_freq_label->setText(QString("%1 MHz").arg(freq, 0, 'f', 3));
 }

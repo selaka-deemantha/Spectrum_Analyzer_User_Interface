@@ -32,13 +32,35 @@ void PlotWidget::paintEvent(QPaintEvent *)
 
     painter.setPen(Qt::green); // green line
 
-    for(int i = 0; i < data.size() - 1; ++i)
-    {
-        int x1 = i * width() / data.size();
-        int y1 = height() - data[i];
-        int x2 = (i+1) * width() / data.size();
-        int y2 = height() - data[i+1];
+    int w = width();
+        int h = height();
 
-        painter.drawLine(x1, y1, x2, y2);
-    }
+        // 2️⃣ Draw grid
+        painter.setPen(QPen(QColor(80, 80, 80), 1.5));
+
+        const int verticalDivs = 10;
+        const int horizontalDivs = 8;
+
+        // Vertical grid lines
+        for (int i = 1; i < verticalDivs; ++i) {
+            int x = i * w / verticalDivs;
+            painter.drawLine(x, 0, x, h);
+        }
+
+        // Horizontal grid lines
+        for (int i = 1; i < horizontalDivs; ++i) {
+            int y = i * h / horizontalDivs;
+            painter.drawLine(0, y, w, y);
+        }
+
+        painter.setPen(QPen(Qt::green, 2));
+
+        for(int i = 0; i < data.size() - 1; ++i) {
+            int x1 = i * width() / data.size();
+            int y1 = height() - data[i];
+            int x2 = (i+1) * width() / data.size();
+            int y2 = height() - data[i+1];
+
+            painter.drawLine(x1, y1, x2, y2);
+        }
 }
