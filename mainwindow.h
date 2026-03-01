@@ -16,11 +16,16 @@ public:
     ~MainWindow();
 
 private slots:
+
     void onSpanButtonPressed();
     void onCenterFreqButtonPressed();
+    void onSizeButtonPressed();
 
 private:
     Ui::MainWindow *ui;
+    double m_start_freq = 0.0;
+    double m_end_freq = 0.0;
+    double m_size = 0;
 };
 
 #endif // MAINWINDOW_H
