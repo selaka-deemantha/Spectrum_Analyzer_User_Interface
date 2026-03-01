@@ -7,6 +7,9 @@
 #include <QPixmap>
 #include <QString>
 
+#define DEVICE_PATH "/dev/fft_dma"
+#define NUM_SAMPLES 1024
+
 class PlotWidget : public QWidget
 {
     Q_OBJECT
@@ -18,7 +21,8 @@ public:
     // Data source selector
     enum DataSource {
         RandomData,
-        FileData
+        FileData,
+        DmaData
     };
 
     enum DownSamplingMethod {
@@ -29,6 +33,7 @@ public:
     void setDataSource(DataSource source);
     void setDownSamplingMethod (DownSamplingMethod source);
     void loadFFTFromFile(const QString &filename);
+    void generateFFTFromDMA(QVector<float> &frame);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -39,6 +44,8 @@ private slots:
 
 private:
     static const int FFT_POINTS = 512;
+
+    static bool DEBUG_MSG_ON;          // ✅ only declaration
 
     QVector<int>   data;          // Final 512 bins for display
     QVector<float> sweepBuffer;   // Full sweep accumulation

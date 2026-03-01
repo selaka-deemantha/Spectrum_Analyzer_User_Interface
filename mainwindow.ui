@@ -72,6 +72,19 @@
       <string>Step Size</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="CalibBtn">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>520</y>
+       <width>171</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Calib</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QLabel" name="label_1">
     <property name="geometry">

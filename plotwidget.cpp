@@ -7,6 +7,16 @@
 #include <QFile>
 #include <QTextStream>
 #include <algorithm>
+#include <fcntl.h>
+#include <unistd.h>
+#include <cstring>
+
+
+#define DEVICE_PATH "/dev/fft_dma"
+#define NUM_SAMPLES 1024
+
+
+bool PlotWidget::DEBUG_MSG_ON = false;
 
 PlotWidget::PlotWidget(QWidget *parent)
     : QWidget(parent)
@@ -17,7 +27,7 @@ PlotWidget::PlotWidget(QWidget *parent)
     connect(&timer, &QTimer::timeout,
             this, &PlotWidget::updateData);
 
-    timer.start(50);
+    timer.start(10);
 }
 
 // this function set the debugging mode
@@ -33,23 +43,25 @@ void PlotWidget::setDownSamplingMethod(DownSamplingMethod source)
 
 void PlotWidget::loadFFTFromFile(const QString &filename)
 {
-    qDebug() << "Trying to open file: " << filename;
+    if(DEBUG_MSG_ON) qDebug() << "Trying to open file: " << filename;
     QFile file(filename);
 
     if (!file.exists())
     {
-        qDebug() << "File does NOT exist!";
+        if(DEBUG_MSG_ON) qDebug() << "File does NOT exist!";
         return;
     }
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        qDebug() << "Failed to open FFT file!";
-        qDebug() << "Error:" << file.errorString();
+        if(DEBUG_MSG_ON) {
+            qDebug() << "Failed to open FFT file!";
+            qDebug() << "Error:" << file.errorString();
+        }
         return;
     }
 
-    qDebug() << "File opened successfully!";
+    if(DEBUG_MSG_ON) qDebug() << "File opened successfully!";
 
     QTextStream in(&file);
     fileFFTData.clear();
@@ -74,7 +86,7 @@ void PlotWidget::loadFFTFromFile(const QString &filename)
 
     file.close();
 
-    qDebug() << "Loaded FFT samples:" << fileFFTData.size();
+    if(DEBUG_MSG_ON) qDebug() << "Loaded FFT samples:" << fileFFTData.size();
 }
 
 void PlotWidget::setSweep(double startFreq,
@@ -86,7 +98,7 @@ void PlotWidget::setSweep(double startFreq,
     m_stepSize  = stepSize;
 
     totalSteps = static_cast<int>((m_endFreq - m_startFreq) / m_stepSize);
-    qDebug() << "Total Sweep Steps:" << totalSteps;
+    if(DEBUG_MSG_ON) qDebug() << "Total Sweep Steps:" << totalSteps;
 
     sweepBuffer.clear();
     currentStep = 0;
@@ -117,7 +129,47 @@ void PlotWidget::generateFFTFromFile(QVector<float> &frame)
 
         frame[i] = fileFFTData[fileIndex++];
     }
-    qDebug() << "Copied fft data from file to frame vector";
+    if(DEBUG_MSG_ON) qDebug() << "Copied fft data from file to frame vector";
+}
+
+
+void PlotWidget::generateFFTFromDMA(QVector<float> &frame)
+{
+    frame.resize(FFT_POINTS);
+
+    int fd = ::open(DEVICE_PATH, O_RDONLY);
+    if (fd < 0)
+    {
+        if (DEBUG_MSG_ON) qDebug() << "Failed to open DMA device";
+        frame.fill(0);
+        return;
+    }
+
+    uint32_t rx_buf[NUM_SAMPLES];
+
+    ssize_t ret = ::read(fd, rx_buf, NUM_SAMPLES * sizeof(uint32_t));
+
+    ::close(fd);
+
+    if (ret != NUM_SAMPLES * sizeof(uint32_t))
+    {
+        if (DEBUG_MSG_ON) qDebug() << "Failed to read all DMA samples";
+        frame.fill(0);
+        return;
+    }
+
+    // Skip DC and take first FFT_POINTS bins
+    for (int i = 0; i < FFT_POINTS; ++i)
+    {
+        uint32_t val = rx_buf[i + 1];   // skip DC
+        float f;
+        std::memcpy(&f, &val, sizeof(float));
+
+        frame[i] = std::abs(f);
+    }
+
+    if (DEBUG_MSG_ON)
+        qDebug() << "DMA FFT frame loaded";
 }
 
 void PlotWidget::updateData()
@@ -127,31 +179,31 @@ void PlotWidget::updateData()
 
     if (currentStep >= totalSteps)
     {
-        qDebug() << "Sweep Complete";
+        if(DEBUG_MSG_ON) qDebug() << "Sweep Complete";
 
         downsampleSweep();
 
         sweepBuffer.clear();
         currentStep = 0;
-        totalSteps = 0;
+        //totalSteps = 0;
 
         update();
         return;
     }
 
     double currentFreq = m_startFreq + currentStep * m_stepSize;
-    qDebug() << "Sweep at:" << currentFreq << "MHz";
+    if(DEBUG_MSG_ON) qDebug() << "Sweep at:" << currentFreq << "MHz";
 
     QVector<float> frame;
 
     if (dataSource == RandomData)
     {
-        qDebug() << "Using random data set";
+        if(DEBUG_MSG_ON) qDebug() << "Using random data set";
         generateRandomFFT(frame);
     }
     else
     {
-        qDebug() << "Using FFT data from file";
+        if(DEBUG_MSG_ON) qDebug() << "Using FFT data from file";
         generateFFTFromFile(frame);
     }
 
@@ -168,8 +220,10 @@ void PlotWidget::downsampleSweep()
     int totalBins = sweepBuffer.size();
     float ratio = totalBins / float(FFT_POINTS);
 
-    qDebug() << "total bins in sweep buffer :" << totalBins;
-    qDebug() << "Downsample ratio :" << ratio;
+    if(DEBUG_MSG_ON) {
+        qDebug() << "total bins in sweep buffer :" << totalBins;
+        qDebug() << "Downsample ratio :" << ratio;
+    }
 
     for (int i = 0; i < FFT_POINTS; ++i)
     {

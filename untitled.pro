@@ -19,18 +19,24 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     numpaddialog.cpp \
-    plotwidget.cpp
+    plotwidget.cpp \
+    settingsdialog.cpp
 
 HEADERS += \
     mainwindow.h \
     numpaddialog.h \
-    plotwidget.h
+    plotwidget.h \
+    settingsdialog.h
 
 FORMS += \
     mainwindow.ui \
-    numpaddialog.ui
+    numpaddialog.ui \
+    settingsdialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    resources.qrc

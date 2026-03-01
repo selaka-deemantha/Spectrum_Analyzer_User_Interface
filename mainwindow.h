@@ -20,6 +20,7 @@ private slots:
     void onSpanButtonPressed();
     void onCenterFreqButtonPressed();
     void onSizeButtonPressed();
+    void onCalibButtonPressed();
 
 private:
     Ui::MainWindow *ui;
