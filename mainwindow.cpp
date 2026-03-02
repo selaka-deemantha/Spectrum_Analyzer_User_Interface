@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->CalibBtn, &QPushButton::clicked,this, &MainWindow::onCalibButtonPressed);
 
     //load the fft file for debuggin purposes
-    ui->plotWidget->loadFFTFromFile("/home/selaka/Spectrum_Analyzer_UI/UI_1/fft_output_2.txt");
+    //ui->plotWidget->loadFFTFromFile("/home/selaka/Spectrum_Analyzer_UI/UI_1/fft_output_2.txt");
     //ui->plotWidget->setDataSource(PlotWidget::FileData);
     ui->plotWidget->setDataSource(PlotWidget::RandomData);
 
@@ -90,52 +90,70 @@ void MainWindow::onSizeButtonPressed()
 
 void MainWindow::onCalibButtonPressed()
 {
-    SettingsDialog dlg(this);
+    SettingsDialog dlg(this,
+                       ui->plotWidget->DownSamplingMethod_getter(),
+                       ui->plotWidget->dataSource_getter(),
+                       ui->plotWidget->DisplayMethod_getter());
 
     if (dlg.exec() == QDialog::Accepted)
     {
         int sampling_method  = dlg.selectedSamplingMethod();
         int debugging_method = dlg.selectDebuggingMethod();
+        int display_mode     = dlg.selectDisplayMode();
 
         // ---- Downsampling selection ----
-        if (sampling_method == 0)
-        {
+        if (sampling_method == 0){
             ui->plotWidget->setDownSamplingMethod(PlotWidget::MaxPooling);
             qDebug() << "Downsampling Method: MaxPooling selected";
         }
-        else if (sampling_method == 1)
-        {
+        else if (sampling_method == 1){
             ui->plotWidget->setDownSamplingMethod(PlotWidget::AveragePooling);
             qDebug() << "Downsampling Method: AveragePooling selected";
         }
-        else
-        {
+        else{
             qDebug() << "Unknown Downsampling Method selected!";
         }
 
+
+
+
+
         // ---- Data source selection ----
-        if (debugging_method == 0)
-        {
+        if (debugging_method == 0){
             ui->plotWidget->setDataSource(PlotWidget::DmaData);
             qDebug() << "Data Source: DMA FFT selected";
         }
-        else if (debugging_method == 1)
-        {
+        else if (debugging_method == 1){
             ui->plotWidget->setDataSource(PlotWidget::RandomData);
             qDebug() << "Data Source: Random Data selected";
         }
-        else if (debugging_method == 2)
-        {
+        else if (debugging_method == 2){
             ui->plotWidget->setDataSource(PlotWidget::FileData);
             qDebug() << "Data Source: File Data selected";
         }
-        else
-        {
+        else{
             qDebug() << "Unknown Data Source selected!";
         }
 
-        qDebug() << "Settings applied successfully.";
+//        qDebug() << "Settings applied successfully.";
+
+        // ---- Display Mode selection ----
+
+        if (display_mode == 0){
+            ui->plotWidget->selectOutputDisplayMode(PlotWidget::Linear);
+            qDebug() << "DisplayMode Linear selected";
+        }
+        else if (display_mode == 1){
+            ui->plotWidget->selectOutputDisplayMode(PlotWidget::dB);
+            qDebug() << "DisplayMode dB selected";
+        }
+        else{
+            qDebug() << "Unknown Downsampling Method selected!";
+        }
+
     }
+
+
     else
     {
         qDebug() << "Settings dialog cancelled by user.";

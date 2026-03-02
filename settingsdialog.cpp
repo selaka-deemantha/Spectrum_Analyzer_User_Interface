@@ -1,7 +1,10 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
 
-SettingsDialog::SettingsDialog(QWidget *parent) :
+SettingsDialog::SettingsDialog(QWidget *parent,
+                                int samplingMethod,
+                                int dataSource,
+                                int displayMode) :
     QDialog(parent),
     ui(new Ui::SettingsDialog)
 {
@@ -29,6 +32,14 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
       ui->comboBox_2->addItem("Read random data");
       ui->comboBox_2->addItem("Read from test file");
 
+      ui->comboBox_3->addItem("Linear Mode");
+      ui->comboBox_3->addItem("Db Mode");
+
+      // ---- Set Current Selections ----
+      ui->comboBox->setCurrentIndex(samplingMethod);
+      ui->comboBox_2->setCurrentIndex(dataSource);
+      ui->comboBox_3->setCurrentIndex(displayMode);
+
 }
 
 SettingsDialog::~SettingsDialog()
@@ -42,4 +53,8 @@ int SettingsDialog::selectedSamplingMethod() const{
 
 int SettingsDialog::selectDebuggingMethod() const{
     return ui->comboBox_2->currentIndex();
+}
+
+int SettingsDialog::selectDisplayMode() const{
+    return ui->comboBox_3->currentIndex();
 }

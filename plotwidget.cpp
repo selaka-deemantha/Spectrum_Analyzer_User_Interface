@@ -40,58 +40,73 @@ void PlotWidget::setDownSamplingMethod(DownSamplingMethod source)
 {
     samplingMethod = source;
 }
-
-void PlotWidget::loadFFTFromFile(const QString &filename)
+// this function will set the display mode (dB or Linear scale)
+void PlotWidget::selectOutputDisplayMode(DisplayMethod source)
 {
-    if(DEBUG_MSG_ON) qDebug() << "Trying to open file: " << filename;
-    QFile file(filename);
+    displayMode = source;
 
-    if (!file.exists())
-    {
-        if(DEBUG_MSG_ON) qDebug() << "File does NOT exist!";
-        return;
-    }
+}
+void PlotWidget::generateFFTFromFile(QVector<float> &frame)
+{
+    frame.clear();
+    frame.reserve(FFT_POINTS);
 
+    QFile file("/home/selaka/Spectrum_Analyzer_UI/UI_1/fft_output_2.txt");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        if(DEBUG_MSG_ON) {
-            qDebug() << "Failed to open FFT file!";
-            qDebug() << "Error:" << file.errorString();
-        }
+        if (DEBUG_MSG_ON)
+            qDebug() << "Failed to open file:" << file.errorString();
         return;
     }
 
-    if(DEBUG_MSG_ON) qDebug() << "File opened successfully!";
-
     QTextStream in(&file);
-    fileFFTData.clear();
-    fileIndex = 0;
+    bool firstSample = true;  // skip DC
+    int count = 0;
 
-    while (!in.atEnd())
+    while (!in.atEnd() && count < FFT_POINTS)
     {
         QString line = in.readLine().trimmed();
-        if (line.isEmpty())
-            continue;
+        if (line.isEmpty()) continue;
 
-        // Read as decimal float
         bool ok;
-        float value = line.toFloat(&ok);
-        if (ok)
+        uint32_t hexVal = line.toUInt(&ok, 16);
+        if (!ok) continue;
+
+        float f;
+        std::memcpy(&f, &hexVal, sizeof(float));
+
+        if (firstSample)
         {
-            // Optional: scale down large values for plotting
-            value /= 1e12f;
-            fileFFTData.append(value);
+            firstSample = false;  // skip DC
+            continue;
         }
+
+        // Power → magnitude
+        float mag = std::sqrt(f);
+
+        // Single-sided scaling
+        mag = (2.0f * mag) / 1024.0f;
+
+        if (displayMode == dB)
+        {
+            float magDb = 20.0f * std::log10(mag + 1e-12f);
+            frame.append(magDb);
+        }
+        else
+        {
+            frame.append(mag);  // linear mode
+        }
+
+        count++;
     }
 
     file.close();
 
-    if(DEBUG_MSG_ON) qDebug() << "Loaded FFT samples:" << fileFFTData.size();
+//    if (DEBUG_MSG_ON)
+     qDebug() << "i'm called..... Loaded FFT frame. Mode:" << (displayMode == dB ? "dB" : "Linear");
 }
 
-void PlotWidget::setSweep(double startFreq,
-                          double endFreq,
-                          double stepSize)
+void PlotWidget::setSweep(double startFreq, double endFreq, double stepSize)
 {
     m_startFreq = startFreq;
     m_endFreq   = endFreq;
@@ -114,24 +129,6 @@ void PlotWidget::generateRandomFFT(QVector<float> &frame)
     // Add fixed peak for visibility
     frame[300] += 100;
 }
-
-void PlotWidget::generateFFTFromFile(QVector<float> &frame)
-{
-    frame.resize(FFT_POINTS);
-
-    if (fileFFTData.isEmpty())
-        return;
-
-    for (int i = 0; i < FFT_POINTS; ++i)
-    {
-        if (fileIndex >= fileFFTData.size())
-            fileIndex = 0;
-
-        frame[i] = fileFFTData[fileIndex++];
-    }
-    if(DEBUG_MSG_ON) qDebug() << "Copied fft data from file to frame vector";
-}
-
 
 void PlotWidget::generateFFTFromDMA(QVector<float> &frame)
 {
@@ -180,12 +177,12 @@ void PlotWidget::updateData()
     if (currentStep >= totalSteps)
     {
         if(DEBUG_MSG_ON) qDebug() << "Sweep Complete";
+        qDebug() << "display mode " << displayMode;
 
         downsampleSweep();
 
         sweepBuffer.clear();
         currentStep = 0;
-        //totalSteps = 0;
 
         update();
         return;
@@ -196,20 +193,30 @@ void PlotWidget::updateData()
 
     QVector<float> frame;
 
-    if (dataSource == RandomData)
+    switch (dataSource)
     {
-        if(DEBUG_MSG_ON) qDebug() << "Using random data set";
-        generateRandomFFT(frame);
-    }
-    else
-    {
-        if(DEBUG_MSG_ON) qDebug() << "Using FFT data from file";
-        generateFFTFromFile(frame);
+        case RandomData:
+            //if(DEBUG_MSG_ON) qDebug() << "Using random data set";
+            qDebug() << "Using random data set";
+            generateRandomFFT(frame);
+            break;
+
+        case FileData:
+            //if(DEBUG_MSG_ON) qDebug() << "Using FFT data from file";
+            qDebug() << "Using FFT data from file";
+            generateFFTFromFile(frame);
+            break;
+
+        case DmaData:
+            //if(DEBUG_MSG_ON) qDebug() << "Using DMA FFT data";
+            qDebug() << "Using DMA FFT data";
+            generateFFTFromDMA(frame);  // you can also convert to dB here
+            break;
     }
 
     sweepBuffer.append(frame);
-
     currentStep++;
+    update();  // refresh display
 }
 
 void PlotWidget::downsampleSweep()

@@ -30,8 +30,23 @@ public:
         AveragePooling
     };
 
+    enum DisplayMethod {
+        Linear,
+        dB
+    };
+
     void setDataSource(DataSource source);
     void setDownSamplingMethod (DownSamplingMethod source);
+    void selectOutputDisplayMode (DisplayMethod source);
+
+     // getter functions for settings page
+    DownSamplingMethod DownSamplingMethod_getter() const { return samplingMethod; }
+    DataSource dataSource_getter() const { return dataSource; }
+    DisplayMethod DisplayMethod_getter() const { return displayMode; }
+
+
+
+
     void loadFFTFromFile(const QString &filename);
     void generateFFTFromDMA(QVector<float> &frame);
 
@@ -60,9 +75,12 @@ private:
     int totalSteps  = 0;
     int currentStep = 0;
 
+    QString currentFileName;
+
     // Data source handling
     DataSource dataSource = RandomData;
     DownSamplingMethod samplingMethod = MaxPooling;
+    DisplayMethod displayMode = Linear;
     QVector<float> fileFFTData;
     int fileIndex = 0;
 
@@ -70,6 +88,11 @@ private:
     void generateRandomFFT(QVector<float> &frame);
     void generateFFTFromFile(QVector<float> &frame);
     void downsampleSweep();
+
+
+
+
+
 };
 
 #endif
