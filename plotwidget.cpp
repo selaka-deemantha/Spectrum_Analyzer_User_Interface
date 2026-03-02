@@ -51,7 +51,7 @@ void PlotWidget::generateFFTFromFile(QVector<float> &frame)
     frame.clear();
     frame.reserve(FFT_POINTS);
 
-    QFile file("/home/selaka/Spectrum_Analyzer_UI/UI_1/fft_output_2.txt");
+    QFile file("/home/selaka/Spectrum_Analyzer_UI/UI_1/untitled/fft_output_2.txt");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         if (DEBUG_MSG_ON)
