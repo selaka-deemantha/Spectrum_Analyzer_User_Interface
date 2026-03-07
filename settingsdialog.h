@@ -15,11 +15,17 @@ public:
     explicit SettingsDialog(QWidget *parent = nullptr,
                             int samplingMethod = 0,
                             int dataSource = 0,
-                            int displayMode = 0);
+                            int displayMode = 0,
+                            bool averagingEnabled = false,
+                            int averagingNumber = 1);
     ~SettingsDialog();
     int selectedSamplingMethod() const;
     int selectDebuggingMethod() const;
     int selectDisplayMode() const;
+
+    // --- New getters for averaging ---
+     bool isAveragingEnabled() const;
+     int averagingNumber() const;
 
 private:
     Ui::SettingsDialog *ui;

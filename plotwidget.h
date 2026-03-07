@@ -59,6 +59,19 @@ public:
 
     static bool DEBUG_MSG_ON;
 
+
+    // averaging getters/setters
+
+    // Setters
+    void setAveragingEnabled(bool enable);
+    void setAveragingNumber(int number);
+
+    // Getters
+    bool getAveragingEnabled() const;
+    int getAveragingNumber() const;
+    int getAverageCount() const;
+
+
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
@@ -92,6 +105,12 @@ private:
     double m_stepSize = 10;
     int totalSteps = 0;
     int currentStep = 0;
+
+    // averaging mechanism
+    bool averagingEnabled = false;
+    QVector<float> averagedData;
+    int averaging_number = 4;
+    int avg_count = 0;
 };
 
 #endif // PLOTWIDGET_H

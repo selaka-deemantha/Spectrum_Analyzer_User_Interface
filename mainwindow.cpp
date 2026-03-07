@@ -8,10 +8,14 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QMessageBox>
+#include <QCheckBox>
+#include <QSpinBox>
 
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
+
+
 
 double start_freq;
 double end_freq;
@@ -148,17 +152,20 @@ void MainWindow::onZoomOutButtonPressed()
 
 void MainWindow::onCalibButtonPressed()
 {
-    // ✅ Use new getters
     SettingsDialog dlg(this,
                        ui->plotWidget->getDownSamplingMethod(),
                        ui->plotWidget->getDataSource(),
-                       ui->plotWidget->getDisplayMode());
+                       ui->plotWidget->getDisplayMode(),
+                       ui->plotWidget->getAveragingEnabled(),
+                       ui->plotWidget->getAveragingNumber());
 
     if (dlg.exec() == QDialog::Accepted)
     {
         int sampling_method  = dlg.selectedSamplingMethod();
         int debugging_method = dlg.selectDebuggingMethod();
         int display_mode     = dlg.selectDisplayMode();
+        bool averagingEnabled  = dlg.isAveragingEnabled();
+        int averagingNumber    = dlg.averagingNumber();
 
         // ---- Downsampling selection ----
         if (sampling_method == 0){
@@ -202,6 +209,11 @@ void MainWindow::onCalibButtonPressed()
         else{
             qDebug() << "Unknown Display Mode selected!";
         }
+
+        // ---- Averaging settings ----
+        ui->plotWidget->setAveragingEnabled(averagingEnabled);
+        ui->plotWidget->setAveragingNumber(averagingNumber);
+        qDebug() << "Averaging Enabled:" << averagingEnabled << "Number of Sweeps:" << averagingNumber;
     }
     else
     {

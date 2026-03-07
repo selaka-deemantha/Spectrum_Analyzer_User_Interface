@@ -4,7 +4,9 @@
 SettingsDialog::SettingsDialog(QWidget *parent,
                                 int samplingMethod,
                                 int dataSource,
-                                int displayMode) :
+                                int displayMode,
+                                bool averagingEnabled,
+                                int averagingNumber) :
     QDialog(parent),
     ui(new Ui::SettingsDialog)
 {
@@ -40,6 +42,10 @@ SettingsDialog::SettingsDialog(QWidget *parent,
       ui->comboBox_2->setCurrentIndex(dataSource);
       ui->comboBox_3->setCurrentIndex(displayMode);
 
+
+      ui->averagingCheckBox->setChecked(averagingEnabled);
+      ui->averagingSpinBox->setValue(averagingNumber);
+
 }
 
 SettingsDialog::~SettingsDialog()
@@ -57,4 +63,14 @@ int SettingsDialog::selectDebuggingMethod() const{
 
 int SettingsDialog::selectDisplayMode() const{
     return ui->comboBox_3->currentIndex();
+}
+
+
+// --- getters for averaging ---
+bool SettingsDialog::isAveragingEnabled() const {
+    return ui->averagingCheckBox->isChecked();
+}
+
+int SettingsDialog::averagingNumber() const {
+    return ui->averagingSpinBox->value();
 }

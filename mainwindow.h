@@ -35,6 +35,9 @@ private slots:
     void onZoomInButtonPressed();
     void onZoomOutButtonPressed();
 
+    void setAveragingEnabled();
+    void setAveragingNumber();
+
 private:
     Ui::MainWindow *ui;
 

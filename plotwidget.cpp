@@ -88,6 +88,29 @@ void PlotWidget::selectOutputDisplayMode(DisplayMethod source)
     displayMode = source;
 }
 
+
+
+// averaging setters
+void PlotWidget::setAveragingEnabled(bool enable)
+{
+    averagingEnabled = enable;
+    averagedData.clear();
+    avg_count = 0;
+}
+
+void PlotWidget::setAveragingNumber(int number)
+{
+    averaging_number = number;
+    averagedData.clear();
+    avg_count = 0;
+}
+
+// averaging getters
+bool PlotWidget::getAveragingEnabled() const { return averagingEnabled;}
+int PlotWidget::getAveragingNumber() const { return averaging_number;}
+int PlotWidget::getAverageCount() const { return avg_count;}
+
+
 // ---------------- Sweep ----------------
 void PlotWidget::setSweep(double startFreq, double endFreq, double stepSize)
 {
@@ -225,37 +248,100 @@ void PlotWidget::downsampleSweep()
 // ---------------- Timer slot ----------------
 void PlotWidget::updateData()
 {
-    if(totalSteps<=0) return;
+    if(totalSteps <= 0) return;
 
-    if(currentStep>=totalSteps) {
-        if(DEBUG_MSG_ON) qDebug() << "Sweep Complete";
+    // Sweep complete
+    if(currentStep >= totalSteps) {
+
+        if(DEBUG_MSG_ON)
+            qDebug() << "Sweep Complete";
+
+        // Downsample sweep
         downsampleSweep();
+
+        // Reset sweep buffer
         sweepBuffer.clear();
         currentStep = 0;
-        // Update chart series
+
+        QVector<float> *plotData = &data;
+
+        // ---------------- Averaging ----------------
+        if(averagingEnabled) {
+
+            if(averagedData.isEmpty()) {
+
+                averagedData.resize(data.size());
+                for(int i = 0; i < data.size(); i++)
+                    averagedData[i] = data[i];
+
+                avg_count = 1;
+            }
+            else {
+
+                int n = std::min(avg_count + 1, averaging_number);
+
+                for(int i = 0; i < data.size(); i++) {
+                    averagedData[i] =
+                        (averagedData[i] * (n - 1) + data[i]) / n;
+                }
+
+                avg_count = n;
+            }
+
+            plotData = &averagedData;
+        }
+        // ------------------------------------------------
+
+
+        // Update chart
         QVector<QPointF> points;
-        points.reserve(data.size());
-        for(int i=0;i<data.size();i++)
-            points.append(QPointF(i,data[i]));
+        points.reserve(plotData->size());
+
+        for(int i = 0; i < plotData->size(); i++)
+            points.append(QPointF(i, (*plotData)[i]));
+
         series->replace(points);
-        // Update Y axis range
-        float maxVal = *std::max_element(data.begin(), data.end());
-        float minVal = *std::min_element(data.begin(), data.end());
+
+
+        // Update Y axis
+        float maxVal = *std::max_element(plotData->begin(), plotData->end());
+        float minVal = *std::min_element(plotData->begin(), plotData->end());
+
         axisY->setRange(minVal, maxVal);
+
         return;
     }
 
+
+    // ---------------- Continue Sweep ----------------
+
     double currentFreq = m_startFreq + currentStep * m_stepSize;
-    if(DEBUG_MSG_ON) qDebug() << "Sweep at:" << currentFreq << "MHz";
+
+    if(DEBUG_MSG_ON)
+        qDebug() << "Sweep at:" << currentFreq << "MHz";
 
     QVector<float> frame;
+
     switch(dataSource) {
-        case RandomData: qDebug() << "Using random data set"; generateRandomFFT(frame); break;
-        case FileData: qDebug() << "Using FFT data from file"; generateFFTFromFile(frame); break;
-        case DmaData: qDebug() << "Using DMA FFT data"; generateFFTFromDMA(frame); break;
+
+        case RandomData:
+            qDebug() << "Using random data set";
+            generateRandomFFT(frame);
+            break;
+
+        case FileData:
+            qDebug() << "Using FFT data from file";
+            generateFFTFromFile(frame);
+            break;
+
+        case DmaData:
+            qDebug() << "Using DMA FFT data";
+            generateFFTFromDMA(frame);
+            break;
     }
 
     sweepBuffer.append(frame);
+
     currentStep++;
 }
 
