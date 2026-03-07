@@ -5,6 +5,13 @@
 #include "settingsdialog.h"
 
 #include <QDebug>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QMessageBox>
+
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
 
 double start_freq;
 double end_freq;
@@ -77,6 +84,41 @@ void MainWindow::onSizeButtonPressed()
     if (dlg.exec() == QDialog::Accepted) {
         m_size = dlg.value();
         qDebug() << "Step Size set to:" << m_size;
+
+        if (OS_TYPE == "LINUX") {
+            qDebug() << "OS : LINUX";
+
+            // open the VCO driver
+            int fd = open(VCO_DEVICE, O_RDWR);
+            if (fd < 0) {
+                qDebug() << "open failed:" << strerror(errno);
+                return;
+            }
+
+            qDebug() << "Opened the driver";
+
+            uint32_t data[4] = {
+                static_cast<uint32_t>(m_start_freq),
+                static_cast<uint32_t>(m_end_freq),
+                static_cast<uint32_t>(m_size),
+                static_cast<uint32_t>(1)
+            };
+
+            if (write(fd, data, sizeof(data)) != sizeof(data)) {
+                qDebug() << "write failed:" << strerror(errno);
+                ::close(fd);
+                return;
+            }
+
+            qDebug() << "Wrote the frequency data to VCO";
+
+            ::close(fd);
+        }
+        else {
+            qDebug() << "OS : WINDOWS";
+
+        }
+
     }
 
     ui->size_label->setText(QString("%1 MHz").arg(m_size, 0, 'f', 1));

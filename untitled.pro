@@ -25,6 +25,7 @@ SOURCES += \
     settingsdialog.cpp
 
 HEADERS += \
+    appconfig.h \
     chart.h \
     chartview.h \
     mainwindow.h \
