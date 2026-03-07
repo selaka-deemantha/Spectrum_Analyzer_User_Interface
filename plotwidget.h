@@ -2,13 +2,39 @@
 #define PLOTWIDGET_H
 
 #include <QWidget>
-#include <QVector>
 #include <QTimer>
+#include <QVector>
 #include <QPixmap>
-#include <QString>
+#include <QChartView>
+#include <QLineSeries>
+#include <QValueAxis>
+#include <QDebug>
+#include <QFile>
+#include <QTextStream>
+#include <QRandomGenerator>
+#include <cmath>
+#include <cstdint>
+#include "chart.h"
+#include "chartview.h"
 
-#define DEVICE_PATH "/dev/fft_dma"
-#define NUM_SAMPLES 1024
+// ---------------- Enums ----------------
+enum DataSource {
+    RandomData,
+    FileData,
+    DmaData
+};
+
+enum DownSamplingMethod {
+    MaxPooling,
+    AveragePooling
+};
+
+enum DisplayMethod {
+    dB,
+    Linear
+};
+
+#define FFT_POINTS 508
 
 class PlotWidget : public QWidget
 {
@@ -16,83 +42,56 @@ class PlotWidget : public QWidget
 public:
     explicit PlotWidget(QWidget *parent = nullptr);
 
+    // ---------------- Setters ----------------
+    void setDataSource(DataSource source);
+    void setDownSamplingMethod(DownSamplingMethod source);
+    void selectOutputDisplayMode(DisplayMethod source);
+
     void setSweep(double startFreq, double endFreq, double stepSize);
 
-    // Data source selector
-    enum DataSource {
-        RandomData,
-        FileData,
-        DmaData
-    };
+    // ---------------- Getters ----------------
+    DataSource getDataSource() const { return dataSource; }
+    DownSamplingMethod getDownSamplingMethod() const { return samplingMethod; }
+    DisplayMethod getDisplayMode() const { return displayMode; }
 
-    enum DownSamplingMethod {
-        MaxPooling,
-        AveragePooling
-    };
+    void zoomIn();
+    void zoomOut();
 
-    enum DisplayMethod {
-        Linear,
-        dB
-    };
-
-    void setDataSource(DataSource source);
-    void setDownSamplingMethod (DownSamplingMethod source);
-    void selectOutputDisplayMode (DisplayMethod source);
-
-     // getter functions for settings page
-    DownSamplingMethod DownSamplingMethod_getter() const { return samplingMethod; }
-    DataSource dataSource_getter() const { return dataSource; }
-    DisplayMethod DisplayMethod_getter() const { return displayMode; }
-
-
-
-
-    void loadFFTFromFile(const QString &filename);
-    void generateFFTFromDMA(QVector<float> &frame);
+    static bool DEBUG_MSG_ON;
 
 protected:
-    void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
 private slots:
     void updateData();
 
 private:
-    static const int FFT_POINTS = 512;
+    void generateFFTFromFile(QVector<float> &frame);
+    void generateRandomFFT(QVector<float> &frame);
+    void generateFFTFromDMA(QVector<float> &frame);
+    void downsampleSweep();
 
-    static bool DEBUG_MSG_ON;          // ✅ only declaration
+    QVector<float> data;
+    QVector<float> sweepBuffer;
+    QTimer timer;
 
-    QVector<int>   data;          // Final 512 bins for display
-    QVector<float> sweepBuffer;   // Full sweep accumulation
+    Chart *chart = nullptr;
+    ChartView *chartView = nullptr;
+    QLineSeries *series = nullptr;
+    QValueAxis *axisX = nullptr;
+    QValueAxis *axisY = nullptr;
 
-    QTimer   timer;
-    QPixmap  background;
+    QRectF initialPlotArea;
 
-    double m_startFreq  = 0;
-    double m_endFreq    = 0;
-    double m_stepSize   = 0;
-
-    int totalSteps  = 0;
-    int currentStep = 0;
-
-    QString currentFileName;
-
-    // Data source handling
     DataSource dataSource = RandomData;
     DownSamplingMethod samplingMethod = MaxPooling;
     DisplayMethod displayMode = Linear;
-    QVector<float> fileFFTData;
-    int fileIndex = 0;
 
-    void generateGrid();
-    void generateRandomFFT(QVector<float> &frame);
-    void generateFFTFromFile(QVector<float> &frame);
-    void downsampleSweep();
-
-
-
-
-
+    double m_startFreq = 0;
+    double m_endFreq = 100;
+    double m_stepSize = 10;
+    int totalSteps = 0;
+    int currentStep = 0;
 };
 
-#endif
+#endif // PLOTWIDGET_H

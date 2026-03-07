@@ -2,19 +2,14 @@
 
 #include <QPainter>
 #include <QResizeEvent>
-#include <QRandomGenerator>
 #include <QDebug>
-#include <QFile>
-#include <QTextStream>
-#include <algorithm>
 #include <fcntl.h>
 #include <unistd.h>
 #include <cstring>
-
+#include <algorithm>
 
 #define DEVICE_PATH "/dev/fft_dma"
 #define NUM_SAMPLES 1024
-
 
 bool PlotWidget::DEBUG_MSG_ON = false;
 
@@ -24,93 +19,81 @@ PlotWidget::PlotWidget(QWidget *parent)
     data.resize(FFT_POINTS);
     data.fill(0);
 
-    connect(&timer, &QTimer::timeout,
-            this, &PlotWidget::updateData);
+    // ---------------- Chart Setup ----------------
+    series = new QLineSeries();
+
+    chart = new Chart();
+    chart->legend()->hide();
+    chart->setBackgroundBrush(Qt::black);
+    chart->addSeries(series);
+
+    series->setColor(Qt::green);
+
+    axisX = new QValueAxis();
+    axisX->setRange(0, FFT_POINTS);
+    axisX->setTitleText("FFT Bins");
+    axisX->setTitleBrush(Qt::white);
+    axisX->setLabelsBrush(Qt::white);
+
+    axisY = new QValueAxis();
+    axisY->setRange(0, 100);
+    axisY->setTitleText("Magnitude");
+    axisY->setTitleBrush(Qt::white);
+    axisY->setLabelsBrush(Qt::white);
+
+    chart->addAxis(axisX, Qt::AlignBottom);
+    chart->addAxis(axisY, Qt::AlignLeft);
+
+    series->attachAxis(axisX);
+    series->attachAxis(axisY);
+
+    chartView = new ChartView(chart, this);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+    chartView->setGeometry(rect());
+
+    initialPlotArea = chart->plotArea();
+    chartView->initialPlotArea = initialPlotArea;
+
+    connect(&timer, &QTimer::timeout, this, &PlotWidget::updateData);
 
     timer.start(10);
 }
 
-// this function set the debugging mode
+// ---------------- Zoom Methods ----------------
+void PlotWidget::zoomIn() {
+    chart->zoomIn();
+}
+
+void PlotWidget::zoomOut() {
+    chart->zoomOut();
+    if (chart->plotArea().width() > initialPlotArea.width() || chart->plotArea().height() > initialPlotArea.height()) {
+        chart->zoomReset();
+    }
+}
+
+// ---------------- Setters ----------------
 void PlotWidget::setDataSource(DataSource source)
 {
     dataSource = source;
 }
-// this function will set the downsampling method
+
 void PlotWidget::setDownSamplingMethod(DownSamplingMethod source)
 {
     samplingMethod = source;
 }
-// this function will set the display mode (dB or Linear scale)
+
 void PlotWidget::selectOutputDisplayMode(DisplayMethod source)
 {
     displayMode = source;
-
-}
-void PlotWidget::generateFFTFromFile(QVector<float> &frame)
-{
-    frame.clear();
-    frame.reserve(FFT_POINTS);
-
-    QFile file("/home/selaka/Spectrum_Analyzer_UI/UI_1/untitled/fft_output_2.txt");
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        if (DEBUG_MSG_ON)
-            qDebug() << "Failed to open file:" << file.errorString();
-        return;
-    }
-
-    QTextStream in(&file);
-    bool firstSample = true;  // skip DC
-    int count = 0;
-
-    while (!in.atEnd() && count < FFT_POINTS)
-    {
-        QString line = in.readLine().trimmed();
-        if (line.isEmpty()) continue;
-
-        bool ok;
-        uint32_t hexVal = line.toUInt(&ok, 16);
-        if (!ok) continue;
-
-        float f;
-        std::memcpy(&f, &hexVal, sizeof(float));
-
-        if (firstSample)
-        {
-            firstSample = false;  // skip DC
-            continue;
-        }
-
-        // Power → magnitude
-        float mag = std::sqrt(f);
-
-        // Single-sided scaling
-        mag = (2.0f * mag) / 1024.0f;
-
-        if (displayMode == dB)
-        {
-            float magDb = 20.0f * std::log10(mag + 1e-12f);
-            frame.append(magDb);
-        }
-        else
-        {
-            frame.append(mag);  // linear mode
-        }
-
-        count++;
-    }
-
-    file.close();
-
-//    if (DEBUG_MSG_ON)
-     qDebug() << "i'm called..... Loaded FFT frame. Mode:" << (displayMode == dB ? "dB" : "Linear");
 }
 
+// ---------------- Sweep ----------------
 void PlotWidget::setSweep(double startFreq, double endFreq, double stepSize)
 {
     m_startFreq = startFreq;
-    m_endFreq   = endFreq;
-    m_stepSize  = stepSize;
+    m_endFreq = endFreq;
+    m_stepSize = stepSize;
 
     totalSteps = static_cast<int>((m_endFreq - m_startFreq) / m_stepSize);
     if(DEBUG_MSG_ON) qDebug() << "Total Sweep Steps:" << totalSteps;
@@ -119,15 +102,61 @@ void PlotWidget::setSweep(double startFreq, double endFreq, double stepSize)
     currentStep = 0;
 }
 
+// ---------------- FFT Generation ----------------
 void PlotWidget::generateRandomFFT(QVector<float> &frame)
 {
     frame.resize(FFT_POINTS);
-
-    for (int i = 0; i < FFT_POINTS; ++i)
+    for(int i=0; i<FFT_POINTS; ++i)
         frame[i] = QRandomGenerator::global()->bounded(20);
 
-    // Add fixed peak for visibility
-    frame[300] += 100;
+    frame[300] += 100; // fixed peak
+}
+
+void PlotWidget::generateFFTFromFile(QVector<float> &frame)
+{
+    frame.clear();
+    frame.reserve(FFT_POINTS);
+
+    QFile file("/home/selaka/Spectrum_Analyzer_UI/UI_1/untitled/fft_output_2.txt");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        if(DEBUG_MSG_ON)
+            qDebug() << "Failed to open file:" << file.errorString();
+        return;
+    }
+
+    QTextStream in(&file);
+    bool firstSample = true;
+    int count = 0;
+
+    while(!in.atEnd() && count < FFT_POINTS) {
+        QString line = in.readLine().trimmed();
+        if(line.isEmpty()) continue;
+
+        bool ok;
+        uint32_t hexVal = line.toUInt(&ok, 16);
+        if(!ok) continue;
+
+        float f;
+        std::memcpy(&f, &hexVal, sizeof(float));
+
+        if(firstSample) {
+            firstSample = false;
+            continue;
+        }
+
+        float mag = std::sqrt(f);
+        mag = (2.0f * mag) / 1024.0f;
+
+        if(displayMode == dB)
+            frame.append(20.0f * std::log10(mag + 1e-12f));
+        else
+            frame.append(mag);
+
+        count++;
+    }
+
+    file.close();
+    qDebug() << "Loaded FFT frame. Mode:" << (displayMode == dB ? "dB" : "Linear");
 }
 
 void PlotWidget::generateFFTFromDMA(QVector<float> &frame)
@@ -135,56 +164,84 @@ void PlotWidget::generateFFTFromDMA(QVector<float> &frame)
     frame.resize(FFT_POINTS);
 
     int fd = ::open(DEVICE_PATH, O_RDONLY);
-    if (fd < 0)
-    {
-        if (DEBUG_MSG_ON) qDebug() << "Failed to open DMA device";
+    if(fd<0) {
+        if(DEBUG_MSG_ON) qDebug() << "Failed to open DMA device";
         frame.fill(0);
         return;
     }
 
     uint32_t rx_buf[NUM_SAMPLES];
-
-    ssize_t ret = ::read(fd, rx_buf, NUM_SAMPLES * sizeof(uint32_t));
-
+    ssize_t ret = ::read(fd, rx_buf, NUM_SAMPLES*sizeof(uint32_t));
     ::close(fd);
 
-    if (ret != NUM_SAMPLES * sizeof(uint32_t))
-    {
-        if (DEBUG_MSG_ON) qDebug() << "Failed to read all DMA samples";
+    if(ret != NUM_SAMPLES*sizeof(uint32_t)) {
+        if(DEBUG_MSG_ON) qDebug() << "Failed to read all DMA samples";
         frame.fill(0);
         return;
     }
 
-    // Skip DC and take first FFT_POINTS bins
-    for (int i = 0; i < FFT_POINTS; ++i)
-    {
-        uint32_t val = rx_buf[i + 1];   // skip DC
+    for(int i=0; i<FFT_POINTS; ++i) {
+        uint32_t val = rx_buf[i+1];
         float f;
         std::memcpy(&f, &val, sizeof(float));
-
         frame[i] = std::abs(f);
     }
 
-    if (DEBUG_MSG_ON)
+    if(DEBUG_MSG_ON)
         qDebug() << "DMA FFT frame loaded";
 }
 
+// ---------------- Downsample ----------------
+void PlotWidget::downsampleSweep()
+{
+    if(sweepBuffer.isEmpty()) return;
+
+    int totalBins = sweepBuffer.size();
+    float ratio = totalBins / float(FFT_POINTS);
+
+    for(int i=0;i<FFT_POINTS;++i) {
+        int start = i*ratio;
+        int end = (i+1)*ratio;
+        if(end>totalBins) end = totalBins;
+
+        if(samplingMethod==MaxPooling) {
+            float maxVal = 0;
+            for(int j=start;j<end;++j)
+                maxVal = std::max(maxVal, sweepBuffer[j]);
+            data[i] = maxVal;
+        }
+        else {
+            float sum=0;
+            int count=0;
+            for(int j=start;j<end;++j){
+                sum+=sweepBuffer[j];
+                count++;
+            }
+            data[i] = (count>0) ? sum/count : 0;
+        }
+    }
+}
+
+// ---------------- Timer slot ----------------
 void PlotWidget::updateData()
 {
-    if (totalSteps <= 0)
-        return;
+    if(totalSteps<=0) return;
 
-    if (currentStep >= totalSteps)
-    {
+    if(currentStep>=totalSteps) {
         if(DEBUG_MSG_ON) qDebug() << "Sweep Complete";
-        qDebug() << "display mode " << displayMode;
-
         downsampleSweep();
-
         sweepBuffer.clear();
         currentStep = 0;
-
-        update();
+        // Update chart series
+        QVector<QPointF> points;
+        points.reserve(data.size());
+        for(int i=0;i<data.size();i++)
+            points.append(QPointF(i,data[i]));
+        series->replace(points);
+        // Update Y axis range
+        float maxVal = *std::max_element(data.begin(), data.end());
+        float minVal = *std::min_element(data.begin(), data.end());
+        axisY->setRange(minVal, maxVal);
         return;
     }
 
@@ -192,128 +249,18 @@ void PlotWidget::updateData()
     if(DEBUG_MSG_ON) qDebug() << "Sweep at:" << currentFreq << "MHz";
 
     QVector<float> frame;
-
-    switch (dataSource)
-    {
-        case RandomData:
-            //if(DEBUG_MSG_ON) qDebug() << "Using random data set";
-            qDebug() << "Using random data set";
-            generateRandomFFT(frame);
-            break;
-
-        case FileData:
-            //if(DEBUG_MSG_ON) qDebug() << "Using FFT data from file";
-            qDebug() << "Using FFT data from file";
-            generateFFTFromFile(frame);
-            break;
-
-        case DmaData:
-            //if(DEBUG_MSG_ON) qDebug() << "Using DMA FFT data";
-            qDebug() << "Using DMA FFT data";
-            generateFFTFromDMA(frame);  // you can also convert to dB here
-            break;
+    switch(dataSource) {
+        case RandomData: qDebug() << "Using random data set"; generateRandomFFT(frame); break;
+        case FileData: qDebug() << "Using FFT data from file"; generateFFTFromFile(frame); break;
+        case DmaData: qDebug() << "Using DMA FFT data"; generateFFTFromDMA(frame); break;
     }
 
     sweepBuffer.append(frame);
     currentStep++;
-    update();  // refresh display
-}
-
-void PlotWidget::downsampleSweep()
-{
-    if (sweepBuffer.isEmpty())
-        return;
-
-    int totalBins = sweepBuffer.size();
-    float ratio = totalBins / float(FFT_POINTS);
-
-    if(DEBUG_MSG_ON) {
-        qDebug() << "total bins in sweep buffer :" << totalBins;
-        qDebug() << "Downsample ratio :" << ratio;
-    }
-
-    for (int i = 0; i < FFT_POINTS; ++i)
-    {
-        int start = i * ratio;
-        int end   = (i + 1) * ratio;
-
-        if (end > totalBins)
-            end = totalBins;
-
-        if (samplingMethod == MaxPooling)
-        {
-            float maxVal = 0;
-            for (int j = start; j < end; ++j)
-                maxVal = std::max(maxVal, sweepBuffer[j]);
-
-            data[i] = maxVal;
-        }
-        else if (samplingMethod == AveragePooling)
-        {
-            float sum = 0;
-            int count = 0;
-            for (int j = start; j < end; ++j)
-            {
-                sum += sweepBuffer[j];
-                count++;
-            }
-
-            data[i] = (count > 0) ? (sum / count) : 0;
-        }
-    }
-}
-
-void PlotWidget::paintEvent(QPaintEvent *)
-{
-    QPainter painter(this);
-    painter.drawPixmap(0, 0, background);
-
-    painter.setPen(QPen(Qt::green, 2));
-
-    int w = width();
-    int h = height();
-
-    // Compute min/max as floats
-    float maxVal = *std::max_element(data.begin(), data.end());
-    float minVal = *std::min_element(data.begin(), data.end());
-    float range = maxVal - minVal;
-    if (range == 0) range = 1.0f;
-
-    for (int i = 0; i < data.size() - 1; ++i)
-    {
-        float x1 = i * w / float(data.size());
-        float y1 = h - ((data[i] - minVal) / range) * h;
-
-        float x2 = (i + 1) * w / float(data.size());
-        float y2 = h - ((data[i+1] - minVal) / range) * h;
-
-        painter.drawLine(QPointF(x1, y1), QPointF(x2, y2));
-    }
-}
-
-void PlotWidget::generateGrid()
-{
-    if (width() <= 0 || height() <= 0) return;
-
-    background = QPixmap(size());
-    background.fill(Qt::black);
-
-    QPainter p(&background);
-
-    int w = width();
-    int h = height();
-
-    p.setPen(QPen(QColor(90, 90, 90), 2));
-
-    for (int i = 1; i < 10; ++i)
-        p.drawLine(i * w / 10, 0, i * w / 10, h);
-
-    for (int i = 1; i < 8; ++i)
-        p.drawLine(0, i * h / 8, w, i * h / 8);
 }
 
 void PlotWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-    generateGrid();
+    if(chartView) chartView->setGeometry(rect());
 }

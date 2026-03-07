@@ -1,0 +1,30 @@
+# Qt
+*.o
+moc_*.cpp
+moc_*.h
+ui_*.h
+qrc_*.cpp
+Makefile*
+*.pro.user*
+*.pro.user
+build/
+debug/
+release/
+
+# General
+*.log
+*.tmp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Executables
+untitled

@@ -22,6 +22,11 @@ private slots:
     void onSizeButtonPressed();
     void onCalibButtonPressed();
 
+    void on_SpanBtn_clicked();
+
+    void onZoomInButtonPressed();
+    void onZoomOutButtonPressed();
+
 private:
     Ui::MainWindow *ui;
     double m_start_freq = 0.0;
