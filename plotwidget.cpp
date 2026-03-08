@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <cstring>
 #include <algorithm>
+#include "appconfig.h"
 
 #define DEVICE_PATH "/dev/fft_dma"
 #define NUM_SAMPLES 1024
@@ -171,7 +172,7 @@ void PlotWidget::generateFFTFromFile(QVector<float> &frame)
         mag = (2.0f * mag) / 1024.0f;
 
         if(displayMode == dB)
-            frame.append(20.0f * std::log10(mag + 1e-12f));
+            frame.append(10.0f * std::log10(mag + 1e-12f));
         else
             frame.append(mag);
 
@@ -203,16 +204,38 @@ void PlotWidget::generateFFTFromDMA(QVector<float> &frame)
         return;
     }
 
-    for(int i=0; i<FFT_POINTS; ++i) {
-        uint32_t val = rx_buf[i+1];
-        float f;
-        std::memcpy(&f, &val, sizeof(float));
-        frame[i] = std::abs(f);
+//    for(int i=0; i<FFT_POINTS; ++i) {
+//        // Skip the dc bin
+//        uint32_t val = rx_buf[i+FFT_FRAME_SKIP_SAMPLES];
+//        float f;
+//        std::memcpy(&f, &val, sizeof(float));
+//        frame[i] = std::abs(f);
+//    }
+    const float* fft_data = reinterpret_cast<const float*>(rx_buf) + FFT_FRAME_SKIP_SAMPLES;
+
+    for(int i = 0; i < FFT_POINTS; ++i)
+    {
+        float val = fft_data[i];
+
+        if(displayMode == dB)
+        {
+            // Convert to dB, add small number to avoid log(0)
+            frame[i] = 10.0f * std::log10(val + 1e-12f);
+        }
+        else // Linear
+        {
+            frame[i] = val;
+        }
     }
 
     if(DEBUG_MSG_ON)
         qDebug() << "DMA FFT frame loaded";
 }
+
+
+
+
+
 
 // ---------------- Downsample ----------------
 void PlotWidget::downsampleSweep()

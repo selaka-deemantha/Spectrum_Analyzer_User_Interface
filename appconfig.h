@@ -6,6 +6,8 @@
 
 #define VCO_DEVICE "/dev/vco_axi"
 
+#define FFT_FRAME_SKIP_SAMPLES 4
+
 
 
 // OS variable
