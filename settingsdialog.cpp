@@ -14,11 +14,9 @@ SettingsDialog::SettingsDialog(QWidget *parent,
     // Check if we have a parent (main window)
       if (parent) {
           // Make fullscreen
-          this->showFullScreen();
+          this->setWindowFlags(Qt::Window);
+          this->setWindowState(Qt::WindowFullScreen);
       }
-
-      // Optional: remove window frame for overlay look
-      this->setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowCloseButtonHint);
 
       // Optional: modal so it blocks main window
       this->setWindowModality(Qt::WindowModal);
