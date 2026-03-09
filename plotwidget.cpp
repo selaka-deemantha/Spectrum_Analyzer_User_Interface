@@ -38,9 +38,15 @@ PlotWidget::PlotWidget(QWidget *parent)
 
     axisY = new QValueAxis();
     axisY->setRange(0, 100);
-    axisY->setTitleText("Magnitude");
+    if (SHOW_Y_SCALE_LABELS) {
+        axisY->setTitleText("Magnitude");
+    } else {
+        axisY->setTitleText("");
+    }
     axisY->setTitleBrush(Qt::white);
     axisY->setLabelsBrush(Qt::white);
+    axisY->setLabelsVisible(SHOW_Y_SCALE_LABELS);
+    // axisY->setVisible(SHOW_Y_SCALE_LABELS); // Removed to keep grid lines
 
     chart->addAxis(axisX, Qt::AlignBottom);
     chart->addAxis(axisY, Qt::AlignLeft);

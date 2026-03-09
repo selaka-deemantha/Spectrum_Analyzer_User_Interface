@@ -10,6 +10,7 @@
 #include <QMessageBox>
 #include <QCheckBox>
 #include <QSpinBox>
+#include <QSizePolicy>
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -26,7 +27,44 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Connect buttons to numpaddialog
+    // Set size policies for responsive layout
+    ui->plotWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    ui->controlWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+    ui->controlWidget->setFixedWidth(171);
+
+    // Create bottom bar for labels
+    QWidget *bottomBar = new QWidget();
+    QHBoxLayout *bottomLayout = new QHBoxLayout(bottomBar);
+
+    // Move labels to bottom bar
+    ui->label_1->setParent(bottomBar);
+    ui->center_freq_label->setParent(bottomBar);
+    ui->label_2->setParent(bottomBar);
+    ui->span_label->setParent(bottomBar);
+    ui->label_3->setParent(bottomBar);
+    ui->rbw_label->setParent(bottomBar);
+    ui->label_4->setParent(bottomBar);
+    ui->swt_label->setParent(bottomBar);
+    ui->label_5->setParent(bottomBar);
+
+    // Add labels to bottom layout
+    bottomLayout->addWidget(ui->label_1);
+    bottomLayout->addWidget(ui->center_freq_label);
+    bottomLayout->addWidget(ui->label_2);
+    bottomLayout->addWidget(ui->span_label);
+    bottomLayout->addWidget(ui->label_3);
+    bottomLayout->addWidget(ui->rbw_label);
+    bottomLayout->addWidget(ui->label_4);
+    bottomLayout->addWidget(ui->swt_label);
+    bottomLayout->addWidget(ui->label_5);
+
+    // Set main layout
+    QVBoxLayout *mainLayout = new QVBoxLayout(ui->centralwidget);
+    QHBoxLayout *topLayout = new QHBoxLayout();
+    topLayout->addWidget(ui->plotWidget, 1);
+    topLayout->addWidget(ui->controlWidget, 0);
+    mainLayout->addLayout(topLayout, 1);
+    mainLayout->addWidget(bottomBar, 0);
     connect(ui->CenterFreqBtn, &QPushButton::clicked,this, &MainWindow::onCenterFreqButtonPressed);
     connect(ui->Sizebtn, &QPushButton::clicked,this, &MainWindow::onSizeButtonPressed);
     connect(ui->CalibBtn, &QPushButton::clicked,this, &MainWindow::onCalibButtonPressed);

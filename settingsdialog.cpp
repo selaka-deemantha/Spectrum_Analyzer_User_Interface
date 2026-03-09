@@ -13,9 +13,8 @@ SettingsDialog::SettingsDialog(QWidget *parent,
     ui->setupUi(this);
     // Check if we have a parent (main window)
       if (parent) {
-          // Resize to match parent
-          this->resize(parent->size());
-          this->move(parent->pos());  // optional: align top-left
+          // Make fullscreen
+          this->showFullScreen();
       }
 
       // Optional: remove window frame for overlay look

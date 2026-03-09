@@ -11,4 +11,8 @@
 
 
 // OS variable
-static const QString OS_TYPE = "WIN";  // or "WINDOWS" or "MAC"
+//static const QString OS_TYPE = "LINUX";  // or "WINDOWS" or "MAC"
+static const QString OS_TYPE = "WIN";
+
+// Y-scale labels visibility
+static const bool SHOW_Y_SCALE_LABELS = false;
