@@ -38,11 +38,20 @@ PlotWidget::~PlotWidget()
     dmaThread->wait();
 }
 
+//------------------ Setters and Getters ---------------------//
+
+
+void PlotWidget::setNoiseThreshold(float noise_thresh_val){
+    noise_theshold = noise_thresh_val;
+}
+
+float PlotWidget::getNoiseThreshold() const {
+    return noise_theshold;
+}
+
 void PlotWidget::startAcquisition(uint32_t minF, uint32_t maxF, uint32_t step)
 {
-#if DEBUG_MSG
-    qDebug() << " Acquisition function is running ";
-#endif
+    if (DEBUG_MSG) qDebug() << " Acquisition function is running ";
 
     minFreq = minF;
     maxFreq = maxF;
@@ -251,6 +260,14 @@ void PlotWidget::paintEvent(QPaintEvent *)
                              QString::number(val,'f',1));
         }
     }
+
+    // -------- Noise Floor Line --------
+    painter.setPen(QPen(Qt::red, 2, Qt::DashLine));
+
+    float noiseY = h - ((noiseFloorMean - minVal) / range) * h;
+
+    painter.drawLine(QPointF(leftMargin, noiseY), QPointF(leftMargin + w, noiseY));
+
 }
 
 // Regenerate grid when resized
@@ -279,14 +296,11 @@ void PlotWidget::onNewFFTData(uint32_t index, const std::vector<float>& fft)
 
         if(displayMode == dB) {
             data[offset + i] = 10.0f * std::log10(magnitude + 1e-12f);
-#if DEBUG_MSG
-            qDebug() << "dB scalind method is used";
-#endif
+            if (DEBUG_MSG) qDebug() << "dB scalind method is used";
+
         } else {
             data[offset + i] = magnitude;
-#if DEBUG_MSG
-            qDebug() << "Linear scalind method is used@@";
-#endif
+            if (DEBUG_MSG) qDebug() << "Linear scalind method is used@@";
         }
     }
 
@@ -314,24 +328,18 @@ void PlotWidget::onNewFFTData(uint32_t index, const std::vector<float>& fft)
     }
     else
     {
-#if DEBUG_MSG
-            qDebug() << "Failed to write FFT file";
-#endif
+            if (DEBUG_MSG) qDebug() << "Failed to write FFT file";
     }
 
     if(averagingEnabled){
         if (plot_index == 0) {
             onAveragingData();
-#if DEBUG_MSG
-            qDebug() << "Full frequency sweep completed -> averaging triggered";
-#endif
+            if (DEBUG_MSG) qDebug() << "Full frequency sweep completed -> averaging triggered";
 
         }
     } else {
-#if DEBUG_MSG
-            qDebug() << "Averaging disabled -> updating plot";
-#endif
-        update();
+            if (DEBUG_MSG) qDebug() << "Averaging disabled -> updating plot";
+            update();
     }
 
 #endif
@@ -346,24 +354,17 @@ void PlotWidget::onNewFFTData(uint32_t index, const std::vector<float>& fft)
     if(averagingEnabled){
         if (plot_index == 0){
             onAveragingData();
-#if DEBUG_MSG
-            qDebug() << "Full frequency sweep completed -> averaging triggered" << data[0];
-#endif
+            if (DEBUG_MSG) qDebug() << "Full frequency sweep completed -> averaging triggered" << data[0];
         }
     }
     else {
-#if DEBUG_MSG
-            qDebug() << "Averaging disabled -> updating plot";
-#endif
+            if (DEBUG_MSG) qDebug() << "Averaging disabled -> updating plot";
         plotData = &data;
         update();
 
     }
 
-    //currentStepIndex = (currentStepIndex + 1) % segments;
-#if DEBUG_MSG
-            qDebug() << "on New fft data function from plotwidget " << offset;
-#endif
+    if (DEBUG_MSG) qDebug() << "on New fft data function from plotwidget " << offset;
 
 }
 

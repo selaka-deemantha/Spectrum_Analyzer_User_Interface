@@ -5,7 +5,8 @@ SettingsDialog::SettingsDialog(QWidget *parent,
                                 int samplingMethod,
                                 int displayMode,
                                 bool averagingEnabled,
-                                int averagingNumber) :
+                                int averagingNumber,
+                                float noise_thresh) :
     QDialog(parent),
     ui(new Ui::SettingsDialog)
 {
@@ -37,6 +38,8 @@ SettingsDialog::SettingsDialog(QWidget *parent,
       ui->averagingCheckBox->setChecked(averagingEnabled);
       ui->averagingSpinBox->setValue(averagingNumber);
 
+      ui->noiseThresholdSpinBox->setValue(noise_thresh);
+
 }
 
 SettingsDialog::~SettingsDialog()
@@ -60,4 +63,8 @@ bool SettingsDialog::isAveragingEnabled() const {
 
 int SettingsDialog::averagingNumber() const {
     return ui->averagingSpinBox->value();
+}
+
+float SettingsDialog::noiseThreshold() const {
+    return ui->noiseThresholdSpinBox->value();
 }

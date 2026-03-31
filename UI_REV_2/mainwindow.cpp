@@ -163,9 +163,7 @@ void MainWindow::onEnterButtonPressed()
         return;
     }
 #if DEBUG_MSG
-    qDebug() << "START_IDX =" << start_idx
-             << "STOP_IDX ="  << stop_idx
-             << "STEP_IDX ="  << step_idx;
+    qDebug() << "START_IDX =" << start_idx << "STOP_IDX ="  << stop_idx << "STEP_IDX ="  << step_idx;
 #endif
 
 #if TEST_MODE
@@ -292,7 +290,8 @@ void MainWindow::onSettingsButtonPressed()
                        globalPlotSettings.samplingMethod,
                        globalPlotSettings.displayMode,
                        ui->plotWidget->getAveragingEnabled(),
-                       ui->plotWidget->getAveragingNumber());
+                       ui->plotWidget->getAveragingNumber(),
+                       ui->plotWidget->getNoiseThreshold());
 
     if (dlg.exec() == QDialog::Accepted)
     {
@@ -300,6 +299,7 @@ void MainWindow::onSettingsButtonPressed()
         int display_mode     = dlg.selectDisplayMode();
         bool averagingEnabled  = dlg.isAveragingEnabled();
         int averagingNumber    = dlg.averagingNumber();
+        float noise_thresh     = dlg.noiseThreshold();
 
         // ---- Downsampling selection ----
         if (sampling_method == 0){
@@ -330,6 +330,7 @@ void MainWindow::onSettingsButtonPressed()
         // ---- Averaging settings ----
         ui->plotWidget->setAveragingEnabled(averagingEnabled);
         ui->plotWidget->setAveragingNumber(averagingNumber);
+        ui->plotWidget->setNoiseThreshold(noise_thresh);
         qDebug() << "Averaging Enabled:" << averagingEnabled << "Number of Sweeps:" << averagingNumber;
     }
     else

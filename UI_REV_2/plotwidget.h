@@ -64,11 +64,13 @@ public:
     void setAveragingEnabled(bool enable);
     void setAveragingNumber(int number);
     void setAutosetEnabled(bool enable);
+    void setNoiseThreshold(float number);
 
     // Getters
     bool getAveragingEnabled() const;
     int getAveragingNumber() const;
     int getAverageCount() const;
+    float getNoiseThreshold() const;
 
 public slots:
     void onNewFFTData(uint32_t index, const std::vector<float>& fft);
@@ -125,6 +127,9 @@ private:
     QVector<float> averagedData;
     int averaging_number = 4;
     int avg_count = 0;
+    float noiseFloorMean = 0.0f;
+    float noise_theshold = 0.0f;
+
 
     QThread* dmaThread = new QThread();
     DMAWorker* dmaWorker = new DMAWorker();

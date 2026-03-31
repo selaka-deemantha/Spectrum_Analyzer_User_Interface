@@ -4,56 +4,131 @@
 
 #include "appConfig.h"
 
-// ---------------- Averaging ----------------
+// ---------------- Normal Averaging ----------------
+
+//void PlotWidget::onAveragingData() {
+//    if (data.isEmpty()) return;
+
+//    // Initialize averagedData if it's empty or size mismatch
+//    if (averagedData.size() != data.size()) {
+//        averagedData = data;   // start averaging with first sweep
+//        avg_count = 1;
+//        return;
+//    }
+
+//    // If we reached the desired number of averages, finalize
+//    if (avg_count >= averaging_number) {
+//        plotData = &averagedData;
+//        update();
+//        avg_count = 0;
+//    }
+//    else {
+//        // Incremental averaging
+//        for (int i = 0; i < data.size(); i++) {
+//            averagedData[i] = (averagedData[i] * avg_count + data[i]) / (avg_count + 1);
+//        }
+//        avg_count++;
+//    }
+//}
+
+
+// ---------------- Noise Floor Calculation ----------------
 
 void PlotWidget::onAveragingData()
 {
-    if(data.isEmpty())
+    if (data.isEmpty())
         return;
 
-    QVector<float> frame = data;
-    QVector<float> sortedFrame = frame;
-    std::sort(sortedFrame.begin(), sortedFrame.end());
+    // ----------------------------------------
+    // Ensure plotData is valid and sized
+    // ----------------------------------------
+    if (!plotData)
+        return;
 
-    int cutoffIndex = sortedFrame.size() / 2;
+    plotData->resize(data.size());
+
+    // ----------------------------------------
+    // Step 1: Sort to estimate noise floor
+    // ----------------------------------------
+    QVector<float> sortedData = data;
+    std::sort(sortedData.begin(), sortedData.end());
+
+    int cutoffIndex = sortedData.size() / 2;
+
     float noiseSum = 0.0f;
-    for(int i = 0; i < cutoffIndex; ++i)
-        noiseSum += sortedFrame[i];
+    for (int i = 0; i < cutoffIndex; ++i)
+        noiseSum += sortedData[i];
 
-    float robustMean = noiseSum / cutoffIndex;
+    noiseFloorMean = noiseSum / cutoffIndex;
 
-    qDebug() << "Noise mean : " << robustMean;
+    // ----------------------------------------
+    // Step 2: Apply thresholding
+    // ----------------------------------------
 
-    // --- Step 2: Threshold frame for plotting ---
-    QVector<float> thresholdedFrame(frame.size());
-    for(int i = 0; i < frame.size(); i++) {
-        if(frame[i] > robustMean)
-            thresholdedFrame[i] = frame[i];  // keep spikes
+    for (int i = 0; i < data.size(); i++)
+    {
+        if (data[i] > noiseFloorMean + noise_theshold)
+            (*plotData)[i] = data[i];         // keep spikes
         else
-            thresholdedFrame[i] = 0.0f;      // zero below noise floor
+            (*plotData)[i] = noiseFloorMean;  // flatten noise
     }
 
-    // --- Step 3: Initialize or update averagedData with thresholded frame ---
-    if(averagedData.isEmpty()) {
-        averagedData = thresholdedFrame;  // first frame
-        avg_count = 1;
-    } else {
-        int n = std::min(avg_count + 1, averaging_number);
-
-        for(int i = 0; i < thresholdedFrame.size(); i++) {
-            // Incremental average with thresholded values
-            averagedData[i] = (averagedData[i] * (n - 1) + thresholdedFrame[i]) / n;
-        }
-
-        avg_count = n;
-
-        if(avg_count == averaging_number) {
-            plotData = &averagedData;
-            update();
-            avg_count = 0;
-        }
-    }
+    // ----------------------------------------
+    // Step 3: Trigger UI redraw
+    // ----------------------------------------
+    update();
 }
+
+
+
+//void PlotWidget::onAveragingData()
+//{
+//    if(data.isEmpty())
+//        return;
+
+//    QVector<float> frame = data;
+//    QVector<float> sortedFrame = frame;
+//    std::sort(sortedFrame.begin(), sortedFrame.end());
+
+//    int cutoffIndex = sortedFrame.size() / 2;
+//    float noiseSum = 0.0f;
+//    for(int i = 0; i < cutoffIndex; ++i)
+//        noiseSum += sortedFrame[i];
+
+//    float robustMean = noiseSum / cutoffIndex;
+
+//    qDebug() << "Noise mean : " << robustMean;
+
+//    // --- Step 2: Threshold frame for plotting ---
+//    QVector<float> thresholdedFrame(frame.size());
+//    for(int i = 0; i < frame.size(); i++) {
+//        if(frame[i] > robustMean)
+//            thresholdedFrame[i] = frame[i];  // keep spikes
+//        else
+//            thresholdedFrame[i] = 0.0f;      // zero below noise floor
+//    }
+
+//    // --- Step 3: Initialize or update averagedData with thresholded frame ---
+//    if(averagedData.isEmpty()) {
+//        averagedData = thresholdedFrame;  // first frame
+//        avg_count = 1;
+//    } else {
+//        int n = std::min(avg_count + 1, averaging_number);
+
+//        for(int i = 0; i < thresholdedFrame.size(); i++) {
+//            // Incremental average with thresholded values
+//            averagedData[i] = (averagedData[i] * (n - 1) + thresholdedFrame[i]) / n;
+//        }
+
+//        avg_count = n;
+
+//        if(avg_count == averaging_number) {
+//            plotData = &averagedData;
+//            update();
+//            avg_count = 0;
+//        }
+//    }
+//}
 
 
 
