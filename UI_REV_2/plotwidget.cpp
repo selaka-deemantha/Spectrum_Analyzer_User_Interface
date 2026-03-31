@@ -116,8 +116,8 @@ void PlotWidget::yscaleUpdate()
             maxVal = *std::max_element(plotData->begin() + viewStart, plotData->begin() + viewEnd);
             minVal = *std::min_element(plotData->begin() + viewStart, plotData->begin() + viewEnd);
 #else
-            maxVal = 250;
-            minVal = 50;
+            maxVal = DB_MAX_RANGE;
+            minVal = DB_MIN_RANGE;
 
 //            maxVal = 7;
 //            minVal = -20;
@@ -281,26 +281,30 @@ void PlotWidget::onNewFFTData(uint32_t index, const std::vector<float>& fft)
 {
     uint32_t plot_index = index % segments;
 
-
-
     // Ensure we have space in our data buffer
-
-    if (data.size() < (plot_index + 1) * FFT_POINTS) {
-        return;
-    }
+    if (data.size() < (plot_index + 1) * FFT_POINTS) return;
     int offset = (plot_index) * FFT_POINTS;
-    //if(offset < 0) offset = ( segments - 1)* FFT_POINTS;
 
     for(int i = 0; i < FFT_POINTS; ++i) {
         float magnitude = fft[i];
 
         if(displayMode == dB) {
             data[offset + i] = 10.0f * std::log10(magnitude + 1e-12f);
+#if TEST_MODE
+            if (plot_index % 2 == 0){
+                data[offset + i] = 10.0f * std::log10(magnitude + 1e-12f) + 20;
+            }
+            else {
+                data[offset + i] = 10.0f * std::log10(magnitude + 1e-12f);
+            }
+#else
+            data[offset + i] = 10.0f * std::log10(magnitude + 1e-12f);
+#endif
             if (DEBUG_MSG) qDebug() << "dB scalind method is used";
 
         } else {
             data[offset + i] = magnitude;
-            if (DEBUG_MSG) qDebug() << "Linear scalind method is used@@";
+            if (DEBUG_MSG) qDebug() << "Linear scalind method is used";
         }
     }
 
@@ -333,7 +337,7 @@ void PlotWidget::onNewFFTData(uint32_t index, const std::vector<float>& fft)
 
     if(averagingEnabled){
         if (plot_index == 0) {
-            onAveragingData();
+            ThresholdAveraging();
             if (DEBUG_MSG) qDebug() << "Full frequency sweep completed -> averaging triggered";
 
         }
@@ -343,9 +347,7 @@ void PlotWidget::onNewFFTData(uint32_t index, const std::vector<float>& fft)
     }
 
 #endif
-
 //-----------------------/-----------------------/------------------------//
-
 
 
 
@@ -353,12 +355,12 @@ void PlotWidget::onNewFFTData(uint32_t index, const std::vector<float>& fft)
 
     if(averagingEnabled){
         if (plot_index == 0){
-            onAveragingData();
+            SegmentThresholdAveraging();
             if (DEBUG_MSG) qDebug() << "Full frequency sweep completed -> averaging triggered" << data[0];
         }
     }
     else {
-            if (DEBUG_MSG) qDebug() << "Averaging disabled -> updating plot";
+        if (DEBUG_MSG) qDebug() << "Averaging disabled -> updating plot";
         plotData = &data;
         update();
 

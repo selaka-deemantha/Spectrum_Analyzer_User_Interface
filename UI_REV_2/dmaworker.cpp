@@ -49,7 +49,7 @@ void DMAWorker::start()
         connect(timer, &QTimer::timeout, this, &DMAWorker::readDMASamples);
     }
 
-    timer->start(1);   // 5 ms interval
+    timer->start(5);   // 5 ms interval
 }
 
 void DMAWorker::stop()

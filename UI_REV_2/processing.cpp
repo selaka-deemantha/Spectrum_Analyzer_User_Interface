@@ -6,50 +6,42 @@
 
 // ---------------- Normal Averaging ----------------
 
-//void PlotWidget::onAveragingData() {
-//    if (data.isEmpty()) return;
+void PlotWidget::NormalAveraging() {
+    if (DEBUG_MSG) qDebug() << "Normal averaging algo running";
+    if (data.isEmpty()) return;
 
-//    // Initialize averagedData if it's empty or size mismatch
-//    if (averagedData.size() != data.size()) {
-//        averagedData = data;   // start averaging with first sweep
-//        avg_count = 1;
-//        return;
-//    }
+    if (!plotData) return;
 
-//    // If we reached the desired number of averages, finalize
-//    if (avg_count >= averaging_number) {
-//        plotData = &averagedData;
-//        update();
-//        avg_count = 0;
-//    }
-//    else {
-//        // Incremental averaging
-//        for (int i = 0; i < data.size(); i++) {
-//            averagedData[i] = (averagedData[i] * avg_count + data[i]) / (avg_count + 1);
-//        }
-//        avg_count++;
-//    }
-//}
+    if (averagedData.size() != data.size()) {
+        averagedData = data;
+        avg_count = 1;
+        return;
+    }
+
+    if (avg_count >= averaging_number) {
+        plotData = &averagedData;
+        update();
+        avg_count = 0;
+    }
+    else {
+        for (int i = 0; i < data.size(); i++) {
+            averagedData[i] = (averagedData[i] * avg_count + data[i]) / (avg_count + 1);
+        }
+        avg_count++;
+    }
+}
 
 
-// ---------------- Noise Floor Calculation ----------------
+// ---------------- Noise Floor Threshold Averaging ----------------
 
-void PlotWidget::onAveragingData()
+void PlotWidget::ThresholdAveraging()
 {
-    if (data.isEmpty())
-        return;
+    if (DEBUG_MSG) qDebug() << "Noise Floor Threshold averaging algo running";
+    if (data.isEmpty()) return;
 
-    // ----------------------------------------
-    // Ensure plotData is valid and sized
-    // ----------------------------------------
-    if (!plotData)
-        return;
+    if (!plotData) return;
 
     plotData->resize(data.size());
-
-    // ----------------------------------------
-    // Step 1: Sort to estimate noise floor
-    // ----------------------------------------
     QVector<float> sortedData = data;
     std::sort(sortedData.begin(), sortedData.end());
 
@@ -60,11 +52,6 @@ void PlotWidget::onAveragingData()
         noiseSum += sortedData[i];
 
     noiseFloorMean = noiseSum / cutoffIndex;
-
-    // ----------------------------------------
-    // Step 2: Apply thresholding
-    // ----------------------------------------
-
     for (int i = 0; i < data.size(); i++)
     {
         if (data[i] > noiseFloorMean + noise_theshold)
@@ -72,12 +59,62 @@ void PlotWidget::onAveragingData()
         else
             (*plotData)[i] = noiseFloorMean;  // flatten noise
     }
-
-    // ----------------------------------------
-    // Step 3: Trigger UI redraw
-    // ----------------------------------------
     update();
 }
+
+
+
+
+// ---------------- Segment Based Averaging ----------------
+
+void PlotWidget::SegmentThresholdAveraging()
+{
+    if (DEBUG_MSG) qDebug() << "Segment based averaging algo running";
+    if (data.isEmpty()) return;
+    if (!plotData) return;
+
+    plotData->resize(data.size());
+
+    for (int seg = 0; seg < segments; ++seg)
+    {
+        int startIdx = seg * FFT_POINTS;
+        int endIdx = startIdx + FFT_POINTS;
+
+        QVector<float> segmentData;
+        segmentData.reserve(FFT_POINTS);
+        for (int i = startIdx; i < endIdx; ++i)
+            segmentData.append(data[i]);
+
+        std::sort(segmentData.begin(), segmentData.end());
+        int cutoffIndex = segmentData.size() / 2;
+
+        float noiseSum = 0.0f;
+        for (int i = 0; i < cutoffIndex; ++i)
+            noiseSum += segmentData[i];
+
+        float segmentNoiseFloor = noiseSum / cutoffIndex;
+
+        //Apply threshold: flatten values below noise + threshold
+        for (int i = startIdx; i < endIdx; ++i)
+        {
+            if (data[i]<= segmentNoiseFloor) {
+                (*plotData)[i] = 0.0f;
+            }
+            else {
+                if (data[i] > segmentNoiseFloor + noise_theshold){
+                    (*plotData)[i] = data[i] - segmentNoiseFloor;
+                }
+                else {
+                    (*plotData)[i] = 0.0f;
+                }
+
+            }
+        }
+    }
+
+    update();
+}
+
 
 
 

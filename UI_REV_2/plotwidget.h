@@ -117,8 +117,13 @@ private:
 
     void generateRandomFFT();
     void generateFFTFromFile();
-    void onAveragingData();
     float downsampleSweep(int start, int step);
+
+    // Averaging functions
+    void NormalAveraging();
+    void SegmentThresholdAveraging();
+    void ThresholdAveraging();
+
 
     DownSamplingMethod samplingMethod = MaxPooling;
     DisplayMethod displayMode = Linear;

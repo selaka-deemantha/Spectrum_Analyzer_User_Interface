@@ -9,6 +9,8 @@
 #define DMA_WRITE_FILE 0
 
 #define DB_DYNAMIC_RANGE 0
+#define DB_MAX_RANGE 250
+#define DB_MIN_RANGE 0
 
 
 // ---------------- FFT Simulation ----------------
