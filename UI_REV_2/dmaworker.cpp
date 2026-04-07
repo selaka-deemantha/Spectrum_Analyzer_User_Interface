@@ -49,7 +49,7 @@ void DMAWorker::start()
         connect(timer, &QTimer::timeout, this, &DMAWorker::readDMASamples);
     }
 
-    timer->start(5);   // 5 ms interval
+    timer->start(1);   // 5 ms interval
 }
 
 void DMAWorker::stop()
@@ -59,12 +59,17 @@ void DMAWorker::stop()
     if (fd >= 0) {
             ::close(fd);
             fd = -1;
+
         }
 }
 
 void DMAWorker::readDMASamples()
 {
     if (!running) return;
+
+    if (!readyForNext) return;
+
+    readyForNext = false;
 
 #if TEST_MODE
 
@@ -98,7 +103,7 @@ void DMAWorker::readDMASamples()
     // ----------------------------------------
     // Send data
     // ----------------------------------------
-    emit newFFTData(test_freq_index, fft);
+    emit newFFTData(0.0f, 0.0f, test_freq_index, fft);
 
     test_freq_index = (test_freq_index + 1) % NUM_SAMPLES;
 
@@ -117,17 +122,57 @@ void DMAWorker::readDMASamples()
 
     std::vector<float> fft(FFT_POINTS);
 
-    for (int i = 0; i < FFT_POINTS; ++i) {
-        float val;
-        std::memcpy(&val, &raw_buf[i + 24], sizeof(float));
-        fft[i] = val;
+    int N = 1024;   // full FFT size
+    int start = 25;
+
+    for (int i = 0; i < FFT_POINTS; ++i)
+    {
+        float val1, val2;
+
+        int idx1 = start + i;           // forward
+        //int idx2 = (N - idx1) % N;      // mirrored
+
+        std::memcpy(&val1, &raw_buf[idx1], sizeof(float));
+        //std::memcpy(&val2, &raw_buf[idx2], sizeof(float));
+
+        fft[i] = val1;  // average both sides
     }
 
-    emit newFFTData(freq_index, fft);
+    float noiseSum_dB = 0.0f;
+    float noiseSum_Li = 0.0f;
+    float varianceSum_dB = 0;
+    float varianceSum_Li = 0;
 
-#if DEBUG_MSG
-    qDebug() << "[REAL MODE] index =" << freq_index;
-#endif
+    for (int i = NOISE_START; i<NOISE_END; i++){
+        float val;
+        std::memcpy(&val, &raw_buf[i], sizeof(float));
+        noiseSum_dB += 10.0f * std::log10(val + 1e-12f);
+        noiseSum_Li += val;
+    }
+    float noiseFloor_dB = noiseSum_dB / 200;
+    float noiseFloor_Li = noiseSum_Li / 200;
+
+    for (int i = NOISE_START; i < NOISE_END; i++) {
+        float val;
+        std::memcpy(&val, &raw_buf[i], sizeof(float));
+
+        varianceSum_dB += (10.0f * std::log10(val + 1e-12f) - noiseFloor_dB) * (10.0f * std::log10(val + 1e-12f) - noiseFloor_dB);
+        varianceSum_Li += (val - noiseFloor_Li) * (val - noiseFloor_Li);
+    }
+
+    float variance_dB = varianceSum_dB / (NOISE_END - NOISE_START);
+    float variance_Li = varianceSum_Li / (NOISE_END - NOISE_START);
+    float noiseSpread_dB = std::sqrt(variance_dB);
+    float noiseSpread_Li = std::sqrt(variance_Li);
+
+    emit newFFTData(noiseSpread_dB, noiseSpread_Li, noiseFloor_dB, noiseFloor_Li, freq_index, fft);
+
 
 #endif
+}
+
+
+void DMAWorker::allowNextFrame()
+{
+    readyForNext = true;
 }

@@ -1,0 +1,166 @@
+/****************************************************************************
+** Meta object code from reading C++ file 'dmaworker.h'
+**
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.13)
+**
+** WARNING! All changes made in this file will be lost!
+*****************************************************************************/
+
+#include <memory>
+#include "../UI_REV_2/dmaworker.h"
+#include <QtCore/qbytearray.h>
+#include <QtCore/qmetatype.h>
+#if !defined(Q_MOC_OUTPUT_REVISION)
+#error "The header file 'dmaworker.h' doesn't include <QObject>."
+#elif Q_MOC_OUTPUT_REVISION != 67
+#error "This file was generated using the moc from 5.15.13. It"
+#error "cannot be used with the include files from this version of Qt."
+#error "(The moc has changed too much.)"
+#endif
+
+QT_BEGIN_MOC_NAMESPACE
+QT_WARNING_PUSH
+QT_WARNING_DISABLE_DEPRECATED
+struct qt_meta_stringdata_DMAWorker_t {
+    QByteArrayData data[15];
+    char stringdata0[163];
+};
+#define QT_MOC_LITERAL(idx, ofs, len) \
+    Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
+    qptrdiff(offsetof(qt_meta_stringdata_DMAWorker_t, stringdata0) + ofs \
+        - idx * sizeof(QByteArrayData)) \
+    )
+static const qt_meta_stringdata_DMAWorker_t qt_meta_stringdata_DMAWorker = {
+    {
+QT_MOC_LITERAL(0, 0, 9), // "DMAWorker"
+QT_MOC_LITERAL(1, 10, 10), // "newFFTData"
+QT_MOC_LITERAL(2, 21, 0), // ""
+QT_MOC_LITERAL(3, 22, 14), // "noiseSpread_dB"
+QT_MOC_LITERAL(4, 37, 14), // "noiseSpread_Li"
+QT_MOC_LITERAL(5, 52, 13), // "noiseFloor_dB"
+QT_MOC_LITERAL(6, 66, 13), // "noiseFloor_Li"
+QT_MOC_LITERAL(7, 80, 8), // "uint32_t"
+QT_MOC_LITERAL(8, 89, 5), // "index"
+QT_MOC_LITERAL(9, 95, 18), // "std::vector<float>"
+QT_MOC_LITERAL(10, 114, 7), // "fftData"
+QT_MOC_LITERAL(11, 122, 5), // "start"
+QT_MOC_LITERAL(12, 128, 4), // "stop"
+QT_MOC_LITERAL(13, 133, 14), // "allowNextFrame"
+QT_MOC_LITERAL(14, 148, 14) // "readDMASamples"
+
+    },
+    "DMAWorker\0newFFTData\0\0noiseSpread_dB\0"
+    "noiseSpread_Li\0noiseFloor_dB\0noiseFloor_Li\0"
+    "uint32_t\0index\0std::vector<float>\0"
+    "fftData\0start\0stop\0allowNextFrame\0"
+    "readDMASamples"
+};
+#undef QT_MOC_LITERAL
+
+static const uint qt_meta_data_DMAWorker[] = {
+
+ // content:
+       8,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       5,   14, // methods
+       0,    0, // properties
+       0,    0, // enums/sets
+       0,    0, // constructors
+       0,       // flags
+       1,       // signalCount
+
+ // signals: name, argc, parameters, tag, flags
+       1,    6,   39,    2, 0x06 /* Public */,
+
+ // slots: name, argc, parameters, tag, flags
+      11,    0,   52,    2, 0x0a /* Public */,
+      12,    0,   53,    2, 0x0a /* Public */,
+      13,    0,   54,    2, 0x0a /* Public */,
+      14,    0,   55,    2, 0x08 /* Private */,
+
+ // signals: parameters
+    QMetaType::Void, QMetaType::Float, QMetaType::Float, QMetaType::Float, QMetaType::Float, 0x80000000 | 7, 0x80000000 | 9,    3,    4,    5,    6,    8,   10,
+
+ // slots: parameters
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
+
+       0        // eod
+};
+
+void DMAWorker::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+{
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        auto *_t = static_cast<DMAWorker *>(_o);
+        (void)_t;
+        switch (_id) {
+        case 0: _t->newFFTData((*reinterpret_cast< float(*)>(_a[1])),(*reinterpret_cast< float(*)>(_a[2])),(*reinterpret_cast< float(*)>(_a[3])),(*reinterpret_cast< float(*)>(_a[4])),(*reinterpret_cast< uint32_t(*)>(_a[5])),(*reinterpret_cast< const std::vector<float>(*)>(_a[6]))); break;
+        case 1: _t->start(); break;
+        case 2: _t->stop(); break;
+        case 3: _t->allowNextFrame(); break;
+        case 4: _t->readDMASamples(); break;
+        default: ;
+        }
+    } else if (_c == QMetaObject::IndexOfMethod) {
+        int *result = reinterpret_cast<int *>(_a[0]);
+        {
+            using _t = void (DMAWorker::*)(float , float , float , float , uint32_t , const std::vector<float> & );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&DMAWorker::newFFTData)) {
+                *result = 0;
+                return;
+            }
+        }
+    }
+}
+
+QT_INIT_METAOBJECT const QMetaObject DMAWorker::staticMetaObject = { {
+    QMetaObject::SuperData::link<QObject::staticMetaObject>(),
+    qt_meta_stringdata_DMAWorker.data,
+    qt_meta_data_DMAWorker,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
+
+
+const QMetaObject *DMAWorker::metaObject() const
+{
+    return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
+}
+
+void *DMAWorker::qt_metacast(const char *_clname)
+{
+    if (!_clname) return nullptr;
+    if (!strcmp(_clname, qt_meta_stringdata_DMAWorker.stringdata0))
+        return static_cast<void*>(this);
+    return QObject::qt_metacast(_clname);
+}
+
+int DMAWorker::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    _id = QObject::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        if (_id < 5)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 5;
+    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        if (_id < 5)
+            *reinterpret_cast<int*>(_a[0]) = -1;
+        _id -= 5;
+    }
+    return _id;
+}
+
+// SIGNAL 0
+void DMAWorker::newFFTData(float _t1, float _t2, float _t3, float _t4, uint32_t _t5, const std::vector<float> & _t6)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t3))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t4))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t5))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t6))) };
+    QMetaObject::activate(this, &staticMetaObject, 0, _a);
+}
+QT_WARNING_POP
+QT_END_MOC_NAMESPACE

@@ -1,0 +1,12 @@
+*.jou
+*.log
+*.tmp
+*.str
+*.xpr
+FFT_Processor.cache
+FFT_Processor.gen
+FFT_Processor.hw
+FFT_Processor.ip_user_files
+FFT_Processor.runs
+FFT_Processor.sim
+.Xil

@@ -73,7 +73,7 @@ public:
     float getNoiseThreshold() const;
 
 public slots:
-    void onNewFFTData(uint32_t index, const std::vector<float>& fft);
+    void onNewFFTData(float noiseSpread_dB, float noiseSpread_Li, float noiseFloor_dB, float noiseFloor_Li, uint32_t index, const std::vector<float>& fft);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -135,12 +135,20 @@ private:
     float noiseFloorMean = 0.0f;
     float noise_theshold = 0.0f;
 
+    int avg_number = 0;
+
 
     QThread* dmaThread = new QThread();
     DMAWorker* dmaWorker = new DMAWorker();
 
+
+    bool showSegments = true;
+    int segmentStartIndex = 0;   // left boundary
+    int segmentEndIndex   = 0;   // right boundary
+
 signals:
     // This is the missing declaration causing your error
+    void frameProcessed();
     void peaksUpdated(const QList<float>& peakValues);
 };
 

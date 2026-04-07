@@ -10,7 +10,7 @@
 
 #define DEVICE_PATH "/dev/fft_dma"
 #define NUM_SAMPLES 1024
-#define FFT_POINTS 66  // positive frequencies (excluding DC)
+#define FFT_POINTS 65  // positive frequencies (excluding DC)
 
 #include "appConfig.h"
 
@@ -29,6 +29,7 @@ PlotWidget::PlotWidget(QWidget *parent) : QWidget(parent)
 
     connect(dmaThread, &QThread::finished, dmaWorker, &QObject::deleteLater);
     connect(dmaWorker, &DMAWorker::newFFTData, this, &PlotWidget::onNewFFTData);
+    connect(this, &PlotWidget::frameProcessed, dmaWorker, &DMAWorker::allowNextFrame, Qt::QueuedConnection);
 }
 
 PlotWidget::~PlotWidget()
@@ -159,6 +160,35 @@ void PlotWidget::paintEvent(QPaintEvent *)
     float w = width() - leftMargin;
     float h = height() - bottomMargin;
 
+    // segment divider lines //
+//    if (showSegments && plotData != nullptr)
+//    {
+//        painter.setPen(QPen(QColor(120,120,120), 1, Qt::DashLine));
+
+//        int totalPoints = plotData->size();
+//        int numSegments = totalPoints / FFT_POINTS;
+
+//        float w = width() - leftMargin;
+//        float visiblePoints = viewEnd - viewStart;
+
+//        for (int s = 0; s <= numSegments; ++s)
+//        {
+//            int idx = s * FFT_POINTS;
+
+//            // Only draw visible ones
+//            if (idx < viewStart || idx > viewEnd) continue;
+
+//            float x = leftMargin + (idx - viewStart) * w / visiblePoints;
+
+//            painter.drawLine(QPointF(x, 0), QPointF(x, height()));
+//        }
+//    }
+
+    //
+
+
+
+
     painter.setPen(QPen(Qt::green,2));
 
     float range = maxVal - minVal;
@@ -183,6 +213,15 @@ void PlotWidget::paintEvent(QPaintEvent *)
         float y2 = h - (((*plotData)[i+1] - minVal)/range)*h;
 
         painter.drawLine(QPointF(x1,y1), QPointF(x2,y2));
+
+//        if (std::abs((*plotData)[i] - (*plotData)[i+1]) > noise_theshold)
+//            {
+//                painter.setPen(QPen(Qt::red, 2));
+
+//                painter.drawLine(QPointF(x2, y1), QPointF(x2, y2));
+
+//                painter.setPen(QPen(Qt::green,2));
+//            }
     }
 
     // -------- Peak Detection --------
@@ -262,11 +301,11 @@ void PlotWidget::paintEvent(QPaintEvent *)
     }
 
     // -------- Noise Floor Line --------
-    painter.setPen(QPen(Qt::red, 2, Qt::DashLine));
+//    painter.setPen(QPen(Qt::red, 2, Qt::DashLine));
 
-    float noiseY = h - ((noiseFloorMean - minVal) / range) * h;
+//    float noiseY = h - ((noiseFloorMean - minVal) / range) * h;
 
-    painter.drawLine(QPointF(leftMargin, noiseY), QPointF(leftMargin + w, noiseY));
+//    painter.drawLine(QPointF(leftMargin, noiseY), QPointF(leftMargin + w, noiseY));
 
 }
 
@@ -277,87 +316,76 @@ void PlotWidget::resizeEvent(QResizeEvent *event)
     generateGrid();
 }
 
-void PlotWidget::onNewFFTData(uint32_t index, const std::vector<float>& fft)
+void PlotWidget::onNewFFTData(float noiseSpread_dB, float noiseSpread_Li, float noiseFloor_dB, float noiseFloor_Li, uint32_t index, const std::vector<float>& fft)
 {
+    // Use sequential indexing to avoid duplicate overwrites
     uint32_t plot_index = index % segments;
-
-    // Ensure we have space in our data buffer
-    if (data.size() < (plot_index + 1) * FFT_POINTS) return;
-    int offset = (plot_index) * FFT_POINTS;
-
-    for(int i = 0; i < FFT_POINTS; ++i) {
-        float magnitude = fft[i];
-
-        if(displayMode == dB) {
-            data[offset + i] = 10.0f * std::log10(magnitude + 1e-12f);
-#if TEST_MODE
-            if (plot_index % 2 == 0){
-                data[offset + i] = 10.0f * std::log10(magnitude + 1e-12f) + 20;
-            }
-            else {
-                data[offset + i] = 10.0f * std::log10(magnitude + 1e-12f);
-            }
-#else
-            data[offset + i] = 10.0f * std::log10(magnitude + 1e-12f);
-#endif
-            if (DEBUG_MSG) qDebug() << "dB scalind method is used";
-
-        } else {
-            data[offset + i] = magnitude;
-            if (DEBUG_MSG) qDebug() << "Linear scalind method is used";
-        }
-    }
-
-
-//-----------------------dma write to a file------------------------//
+    int offset = plot_index * FFT_POINTS;
 
 #if DMA_WRITE_FILE
-
     static int fileIndex = 0;
-
     QString filename = QString("fft_output_%1.txt").arg(fileIndex++, 4, 10, QChar('0'));
-
     QFile file(filename);
-
     if(file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
         QTextStream out(&file);
         out << "# Plot index: " << plot_index << "\n";
         out << "# FFT size: " << fft.size() << "\n";
         out << "# Segment size: " << segments << "\n";
+        out << "# NoiseFloor_dB: " << noiseFloor_dB << "\n";
+        out << "# NoiseFloor_Li: " << noiseFloor_Li << "\n";
+        out << "# NiseSpread_dB: " << noiseSpread_dB << "\n";
+        out << "# NiseSpread_Li: " << noiseSpread_Li << "\n";
         for(int i = 0; i < fft.size(); ++i)
             out << fft[i] << "\n";
-
         file.close();
     }
     else
     {
-            if (DEBUG_MSG) qDebug() << "Failed to write FFT file";
+        if (DEBUG_MSG) qDebug() << "Failed to write FFT file";
     }
+#endif
+
+
+    for(int i = 0; i < FFT_POINTS; ++i)
+    {
+        float magnitude = fft[i];
+
+        if(displayMode == dB)
+        {
+            data[offset + i] = 10.0f * std::log10(magnitude + 1e-12f) - noiseFloor_dB + 50.0f;
+
+//            float value;
+//            float threshold = noiseFloor + 2.0f * noiseSpread;
+//            if(magnitude <= noiseFloor)
+//            {
+//                data[offset + i] = 10.0f * std::log10(noiseFloor - magnitude + 1e-12f) + 50.0f;
+//            }
+//            else
+//            {
+//                data[offset + i] = 10.0f * std::log10(magnitude - noiseFloor + 1e-12f) + 50.0f;
+//            }
+        }
+        else
+        {
+            data[offset + i] = magnitude;
+        }
+    }
+
 
     if(averagingEnabled){
-        if (plot_index == 0) {
-            ThresholdAveraging();
-            if (DEBUG_MSG) qDebug() << "Full frequency sweep completed -> averaging triggered";
-
+#if INDEX_BASED
+        if (plot_index == 0){
+            NormalAveraging();
         }
-    } else {
-            if (DEBUG_MSG) qDebug() << "Averaging disabled -> updating plot";
+
+#else
+        if (currentStepIndex == segments - 1){
+            NormalAveraging();
             update();
-    }
+        }
 
 #endif
-//-----------------------/-----------------------/------------------------//
-
-
-
-
-
-    if(averagingEnabled){
-        if (plot_index == 0){
-            SegmentThresholdAveraging();
-            if (DEBUG_MSG) qDebug() << "Full frequency sweep completed -> averaging triggered" << data[0];
-        }
     }
     else {
         if (DEBUG_MSG) qDebug() << "Averaging disabled -> updating plot";
@@ -367,6 +395,56 @@ void PlotWidget::onNewFFTData(uint32_t index, const std::vector<float>& fft)
     }
 
     if (DEBUG_MSG) qDebug() << "on New fft data function from plotwidget " << offset;
+    emit frameProcessed();
 
+currentStepIndex = (currentStepIndex + 1) % segments;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+//void PlotWidget::onNewFFTData(uint32_t index, const std::vector<float>& fft)
+//{
+
+//    // Ensure we have space in our data buffer
+//    if (data.size() < (currentStepIndex + 1) * FFT_POINTS) return;
+//    int offset = (currentStepIndex-1) * FFT_POINTS;
+//    if(offset < 0) offset = ( segments - 1)* FFT_POINTS;
+
+//    for(int i = 0; i < FFT_POINTS; ++i) {
+//        float magnitude = fft[i];
+
+//        if(displayMode == dB) {
+//            data[offset + i] = 10.0f * std::log10(magnitude + 1e-12f);
+//            if (DEBUG_MSG) qDebug() << "dB scalind method is used";
+//        }
+//        else {
+//            data[offset + i] = magnitude;
+//            if (DEBUG_MSG) qDebug() << "Linear scalind method is used";
+//        }
+//    }
+
+//    if(averagingEnabled){
+//        if (currentStepIndex == segments - 1){
+//            SegmentThresholdAveraging();
+//            if (DEBUG_MSG) qDebug() << "Full frequency sweep completed -> averaging triggered" << data[0];
+//        }
+//    }
+//    else {
+//        if (DEBUG_MSG) qDebug() << "Averaging disabled -> updating plot";
+//        plotData = &data;
+//        update();
+
+//    }
+
+//    if (DEBUG_MSG) qDebug() << "on New fft data function from plotwidget " << offset;
+//    currentStepIndex = (currentStepIndex + 1) % segments;
+//}
