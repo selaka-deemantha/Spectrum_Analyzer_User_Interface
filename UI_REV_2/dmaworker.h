@@ -6,9 +6,7 @@
 #include <QTimer>
 #include <vector>
 
-#define DEVICE_PATH "/dev/fft_dma"
-#define NUM_SAMPLES 1024
-#define FFT_POINTS 65
+
 
 class DMAWorker : public QObject
 {

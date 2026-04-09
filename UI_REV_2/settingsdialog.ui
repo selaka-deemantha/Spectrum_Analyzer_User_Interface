@@ -13,32 +13,6 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QComboBox" name="comboBox">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>30</y>
-     <width>201</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="editable">
-    <bool>false</bool>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>30</y>
-     <width>171</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Down Sampling Method</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="okButton">
    <property name="geometry">
     <rect>
@@ -65,187 +39,115 @@
     <string>Cancel</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_3">
+  <widget class="QWidget" name="gridLayoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>70</y>
-     <width>171</width>
-     <height>17</height>
+     <y>20</y>
+     <width>351</width>
+     <height>291</height>
     </rect>
    </property>
-   <property name="text">
-    <string>Display Mode</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="comboBox_3">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>70</y>
-     <width>201</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="editable">
-    <bool>false</bool>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_4">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>120</y>
-     <width>171</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Enable Averaging</string>
-   </property>
-  </widget>
-  <widget class="QSpinBox" name="averagingSpinBox">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>150</y>
-     <width>51</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="value">
-    <number>4</number>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_5">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>150</y>
-     <width>171</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Averaging Count</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_6">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>180</y>
-     <width>171</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Pre Amp ON</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="averagingCheckBox_2">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>190</y>
-     <width>92</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="averagingCheckBox">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>120</y>
-     <width>92</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>CheckBox</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_7">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>220</y>
-     <width>171</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Noise Threshold </string>
-   </property>
-  </widget>
-  <widget class="QSpinBox" name="noiseThresholdSpinBox">
-   <property name="geometry">
-    <rect>
-     <x>227</x>
-     <y>220</y>
-     <width>51</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="value">
-    <number>4</number>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_8">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>300</y>
-     <width>171</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Noise Floor Line Display</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="noiseFloorLevelCheckBox">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>300</y>
-     <width>92</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>CheckBox</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_9">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>390</y>
-     <width>171</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Sweep Delay</string>
-   </property>
-  </widget>
-  <widget class="QSpinBox" name="sweepDelaySpinBox">
-   <property name="geometry">
-    <rect>
-     <x>220</x>
-     <y>370</y>
-     <width>51</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="value">
-    <number>4</number>
-   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="2" column="1">
+     <widget class="QCheckBox" name="averagingCheckBox">
+      <property name="text">
+       <string>CheckBox</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QComboBox" name="comboBox">
+      <property name="editable">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="0">
+     <widget class="QLabel" name="label_6">
+      <property name="text">
+       <string>Pre Amp ON</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_4">
+      <property name="text">
+       <string>Enable Averaging</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="label_5">
+      <property name="text">
+       <string>Averaging Count</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QComboBox" name="comboBox_3">
+      <property name="editable">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QSpinBox" name="averagingSpinBox">
+      <property name="value">
+       <number>4</number>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Down Sampling Method</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QSpinBox" name="noiseThresholdSpinBox">
+      <property name="value">
+       <number>4</number>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_3">
+      <property name="text">
+       <string>Display Mode</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="1">
+     <widget class="QCheckBox" name="preAmpCheckBox">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="label_7">
+      <property name="text">
+       <string>Noise Threshold </string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0">
+     <widget class="QLabel" name="label_8">
+      <property name="text">
+       <string>Alpha Value</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QSpinBox" name="alphaSpinBox">
+      <property name="value">
+       <number>4</number>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>

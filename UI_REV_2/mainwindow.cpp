@@ -7,6 +7,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QMessageBox>
+#include <QProcess>
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -291,50 +292,48 @@ void MainWindow::onSettingsButtonPressed()
                        globalPlotSettings.displayMode,
                        ui->plotWidget->getAveragingEnabled(),
                        ui->plotWidget->getAveragingNumber(),
-                       ui->plotWidget->getNoiseThreshold());
+                       ui->plotWidget->getNoiseThreshold(),
+                       pre_amp_enabled,
+                       ui->plotWidget->getAlpha());
 
     if (dlg.exec() == QDialog::Accepted)
     {
-        int sampling_method  = dlg.selectedSamplingMethod();
-        int display_mode     = dlg.selectDisplayMode();
-        bool averagingEnabled  = dlg.isAveragingEnabled();
-        int averagingNumber    = dlg.averagingNumber();
-        float noise_thresh     = dlg.noiseThreshold();
+        int sampling_method     = dlg.selectedSamplingMethod();
+        int display_mode        = dlg.selectDisplayMode();
+        bool averagingEnabled   = dlg.isAveragingEnabled();
+        pre_amp_enabled         = dlg.isPreAmpEnabled();
+        int averagingNumber     = dlg.averagingNumber();
+        float noise_thresh      = dlg.noiseThreshold();
+        int alpha_value         = dlg.alphaValue();
 
-        // ---- Downsampling selection ----
+
         if (sampling_method == 0){
             ui->plotWidget->setDownSamplingMethod(MaxPooling);
-            qDebug() << "Downsampling Method: MaxPooling selected";
         }
-        else if (sampling_method == 1){
+        else {
             ui->plotWidget->setDownSamplingMethod(AveragePooling);
-            qDebug() << "Downsampling Method: AveragePooling selected";
-        }
-        else{
-            qDebug() << "Unknown Downsampling Method selected!";
         }
 
-        // ---- Display Mode selection ----
+
         if (display_mode == 0){
             ui->plotWidget->selectOutputDisplayMode(Linear);
-            qDebug() << "DisplayMode Linear selected";
         }
-        else if (display_mode == 1){
+        else {
             ui->plotWidget->selectOutputDisplayMode(dB);
-            qDebug() << "DisplayMode dB selected";
-        }
-        else{
-            qDebug() << "Unknown Display Mode selected!";
         }
 
-        // ---- Averaging settings ----
         ui->plotWidget->setAveragingEnabled(averagingEnabled);
         ui->plotWidget->setAveragingNumber(averagingNumber);
         ui->plotWidget->setNoiseThreshold(noise_thresh);
-        qDebug() << "Averaging Enabled:" << averagingEnabled << "Number of Sweeps:" << averagingNumber;
+        ui->plotWidget->setAlpha(alpha_value);
+
+        if (pre_amp_enabled) {
+            QProcess::execute("devmem", QStringList() << "0x41200000" << "w" << "0x1");
+        }
+        else {
+            QProcess::execute("devmem", QStringList() << "0x41200000" << "w" << "0x0");
+        }
+
     }
-    else
-    {
-        qDebug() << "Settings dialog cancelled by user.";
-    }
+
 }

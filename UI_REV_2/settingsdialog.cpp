@@ -6,19 +6,18 @@ SettingsDialog::SettingsDialog(QWidget *parent,
                                 int displayMode,
                                 bool averagingEnabled,
                                 int averagingNumber,
-                                float noise_thresh) :
+                                float noise_thresh,
+                                bool preAmpEnabled,
+                                int alphaValue) :
     QDialog(parent),
     ui(new Ui::SettingsDialog)
 {
     ui->setupUi(this);
-    // Check if we have a parent (main window)
       if (parent) {
-          // Make fullscreen
           this->setWindowFlags(Qt::Window);
           this->setWindowState(Qt::WindowFullScreen);
       }
 
-      // Optional: modal so it blocks main window
       this->setWindowModality(Qt::WindowModal);
 
       connect(ui->okButton, &QPushButton::clicked, this, &QDialog::accept);
@@ -30,13 +29,17 @@ SettingsDialog::SettingsDialog(QWidget *parent,
       ui->comboBox_3->addItem("Linear Mode");
       ui->comboBox_3->addItem("Db Mode");
 
-      // ---- Set Current Selections ----
       ui->comboBox->setCurrentIndex(samplingMethod);
       ui->comboBox_3->setCurrentIndex(displayMode);
 
 
       ui->averagingCheckBox->setChecked(averagingEnabled);
+
+      ui->preAmpCheckBox->setChecked(preAmpEnabled);
+
       ui->averagingSpinBox->setValue(averagingNumber);
+
+      ui->alphaSpinBox->setValue(alphaValue);
 
       ui->noiseThresholdSpinBox->setValue(noise_thresh);
 
@@ -56,10 +59,12 @@ int SettingsDialog::selectDisplayMode() const{
     return ui->comboBox_3->currentIndex();
 }
 
-
-// --- getters for averaging ---
 bool SettingsDialog::isAveragingEnabled() const {
     return ui->averagingCheckBox->isChecked();
+}
+
+bool SettingsDialog::isPreAmpEnabled() const {
+    return ui->preAmpCheckBox->isChecked();
 }
 
 int SettingsDialog::averagingNumber() const {
@@ -68,6 +73,10 @@ int SettingsDialog::averagingNumber() const {
 
 float SettingsDialog::noiseThreshold() const {
     return ui->noiseThresholdSpinBox->value();
+}
+
+int SettingsDialog::alphaValue() const {
+    return ui->alphaSpinBox->value();
 }
 
 

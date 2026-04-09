@@ -65,12 +65,14 @@ public:
     void setAveragingNumber(int number);
     void setAutosetEnabled(bool enable);
     void setNoiseThreshold(float number);
+    void setAlpha(int number);
 
     // Getters
     bool getAveragingEnabled() const;
     int getAveragingNumber() const;
     int getAverageCount() const;
     float getNoiseThreshold() const;
+    int getAlpha() const;
 
 public slots:
     void onNewFFTData(float noiseSpread_dB, float noiseSpread_Li, float noiseFloor_dB, float noiseFloor_Li, uint32_t index, const std::vector<float>& fft);
@@ -124,6 +126,8 @@ private:
     void SegmentThresholdAveraging();
     void ThresholdAveraging();
 
+    int PeakSearch();
+
 
     DownSamplingMethod samplingMethod = MaxPooling;
     DisplayMethod displayMode = Linear;
@@ -136,6 +140,9 @@ private:
     float noise_theshold = 0.0f;
 
     int avg_number = 0;
+
+    int alpha = 0;
+    bool is_Peak = false;
 
 
     QThread* dmaThread = new QThread();

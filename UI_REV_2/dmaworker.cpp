@@ -23,22 +23,14 @@ void DMAWorker::start()
     if (running) return;
 
 #if TEST_MODE
-//    qDebug() << "Starting DMAWorker in TEST MODE";
-    fd = -1;   // no device used
+    fd = -1;
 
 #else
     // open the dma device once
     fd = ::open(DEVICE_PATH, O_RDONLY);
     if (fd < 0) {
-#if DEBUG_MSG
-        qDebug() << "Failed to open DMA device:" << strerror(errno);
-#endif
         return;
     }
-
-#if DEBUG_MSG
-    qDebug() << "Starting DMAWorker in REAL MODE";
-#endif
 
 #endif
 
@@ -49,7 +41,7 @@ void DMAWorker::start()
         connect(timer, &QTimer::timeout, this, &DMAWorker::readDMASamples);
     }
 
-    timer->start(1);   // 5 ms interval
+    timer->start(1);
 }
 
 void DMAWorker::stop()
@@ -59,7 +51,6 @@ void DMAWorker::stop()
     if (fd >= 0) {
             ::close(fd);
             fd = -1;
-
         }
 }
 
@@ -123,19 +114,12 @@ void DMAWorker::readDMASamples()
     std::vector<float> fft(FFT_POINTS);
 
     int N = 1024;   // full FFT size
-    int start = 25;
 
     for (int i = 0; i < FFT_POINTS; ++i)
     {
-        float val1, val2;
-
-        int idx1 = start + i;           // forward
-        //int idx2 = (N - idx1) % N;      // mirrored
-
-        std::memcpy(&val1, &raw_buf[idx1], sizeof(float));
-        //std::memcpy(&val2, &raw_buf[idx2], sizeof(float));
-
-        fft[i] = val1;  // average both sides
+        float val;
+        std::memcpy(&val, &raw_buf[FFT_START + i], sizeof(float));
+        fft[i] = val / LINEAR_SCALE;
     }
 
     float noiseSum_dB = 0.0f;
@@ -149,8 +133,8 @@ void DMAWorker::readDMASamples()
         noiseSum_dB += 10.0f * std::log10(val + 1e-12f);
         noiseSum_Li += val;
     }
-    float noiseFloor_dB = noiseSum_dB / 200;
-    float noiseFloor_Li = noiseSum_Li / 200;
+    float noiseFloor_dB = noiseSum_dB / (NOISE_END - NOISE_START);
+    float noiseFloor_Li = noiseSum_Li / (NOISE_END - NOISE_START);
 
     for (int i = NOISE_START; i < NOISE_END; i++) {
         float val;
