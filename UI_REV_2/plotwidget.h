@@ -66,6 +66,9 @@ public:
     void setAutosetEnabled(bool enable);
     void setNoiseThreshold(float number);
     void setAlpha(int number);
+    void setFFTLower(int number);
+    void setFFTUpper(int numner);
+
 
     // Getters
     bool getAveragingEnabled() const;
@@ -73,6 +76,8 @@ public:
     int getAverageCount() const;
     float getNoiseThreshold() const;
     int getAlpha() const;
+    int getFFTLower() const;
+    int getFFTUpper() const;
 
 public slots:
     void onNewFFTData(float noiseSpread_dB, float noiseSpread_Li, float noiseFloor_dB, float noiseFloor_Li, uint32_t index, const std::vector<float>& fft);
@@ -144,6 +149,9 @@ private:
     int alpha = 0;
     bool is_Peak = false;
 
+    int fft_lower = 25;
+    int fft_upper = 89;
+
 
     QThread* dmaThread = new QThread();
     DMAWorker* dmaWorker = new DMAWorker();
@@ -157,6 +165,7 @@ signals:
     // This is the missing declaration causing your error
     void frameProcessed();
     void peaksUpdated(const QList<float>& peakValues);
+    void fftBoundsChanged(int lower, int upper);
 };
 
 #endif // PLOTWIDGET_H

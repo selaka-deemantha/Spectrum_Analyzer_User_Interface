@@ -294,7 +294,9 @@ void MainWindow::onSettingsButtonPressed()
                        ui->plotWidget->getAveragingNumber(),
                        ui->plotWidget->getNoiseThreshold(),
                        pre_amp_enabled,
-                       ui->plotWidget->getAlpha());
+                       ui->plotWidget->getAlpha(),
+                       ui->plotWidget->getFFTLower(),
+                       ui->plotWidget->getFFTUpper());
 
     if (dlg.exec() == QDialog::Accepted)
     {
@@ -305,6 +307,8 @@ void MainWindow::onSettingsButtonPressed()
         int averagingNumber     = dlg.averagingNumber();
         float noise_thresh      = dlg.noiseThreshold();
         int alpha_value         = dlg.alphaValue();
+        int fft_lower           = dlg.fftLower();
+        int fft_upper           = dlg.fftUpper();
 
 
         if (sampling_method == 0){
@@ -326,6 +330,8 @@ void MainWindow::onSettingsButtonPressed()
         ui->plotWidget->setAveragingNumber(averagingNumber);
         ui->plotWidget->setNoiseThreshold(noise_thresh);
         ui->plotWidget->setAlpha(alpha_value);
+        ui->plotWidget->setFFTLower(fft_lower);
+        ui->plotWidget->setFFTUpper(fft_upper);
 
         if (pre_amp_enabled) {
             QProcess::execute("devmem", QStringList() << "0x41200000" << "w" << "0x1");

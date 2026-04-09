@@ -77,6 +77,13 @@
       </property>
      </widget>
     </item>
+    <item row="5" column="1">
+     <widget class="QSpinBox" name="alphaSpinBox">
+      <property name="value">
+       <number>4</number>
+      </property>
+     </widget>
+    </item>
     <item row="3" column="0">
      <widget class="QLabel" name="label_5">
       <property name="text">
@@ -140,10 +147,31 @@
       </property>
      </widget>
     </item>
-    <item row="5" column="1">
-     <widget class="QSpinBox" name="alphaSpinBox">
-      <property name="value">
-       <number>4</number>
+    <item row="7" column="0">
+     <widget class="QPushButton" name="fftLowerButton">
+      <property name="text">
+       <string>FFT Lower Range</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="0">
+     <widget class="QPushButton" name="fftUpperButton">
+      <property name="text">
+       <string>FFT Upper Range</string>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="1">
+     <widget class="QLabel" name="fftLowerLabel">
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="1">
+     <widget class="QLabel" name="fftUpperLabel">
+      <property name="text">
+       <string>TextLabel</string>
       </property>
      </widget>
     </item>

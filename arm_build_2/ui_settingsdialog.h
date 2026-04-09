@@ -33,6 +33,7 @@ public:
     QComboBox *comboBox;
     QLabel *label_6;
     QLabel *label_4;
+    QSpinBox *alphaSpinBox;
     QLabel *label_5;
     QComboBox *comboBox_3;
     QSpinBox *averagingSpinBox;
@@ -42,7 +43,10 @@ public:
     QCheckBox *preAmpCheckBox;
     QLabel *label_7;
     QLabel *label_8;
-    QSpinBox *alphaSpinBox;
+    QPushButton *fftLowerButton;
+    QPushButton *fftUpperButton;
+    QLabel *fftLowerLabel;
+    QLabel *fftUpperLabel;
 
     void setupUi(QDialog *SettingsDialog)
     {
@@ -81,6 +85,12 @@ public:
         label_4->setObjectName(QString::fromUtf8("label_4"));
 
         gridLayout->addWidget(label_4, 2, 0, 1, 1);
+
+        alphaSpinBox = new QSpinBox(gridLayoutWidget);
+        alphaSpinBox->setObjectName(QString::fromUtf8("alphaSpinBox"));
+        alphaSpinBox->setValue(4);
+
+        gridLayout->addWidget(alphaSpinBox, 5, 1, 1, 1);
 
         label_5 = new QLabel(gridLayoutWidget);
         label_5->setObjectName(QString::fromUtf8("label_5"));
@@ -130,11 +140,25 @@ public:
 
         gridLayout->addWidget(label_8, 5, 0, 1, 1);
 
-        alphaSpinBox = new QSpinBox(gridLayoutWidget);
-        alphaSpinBox->setObjectName(QString::fromUtf8("alphaSpinBox"));
-        alphaSpinBox->setValue(4);
+        fftLowerButton = new QPushButton(gridLayoutWidget);
+        fftLowerButton->setObjectName(QString::fromUtf8("fftLowerButton"));
 
-        gridLayout->addWidget(alphaSpinBox, 5, 1, 1, 1);
+        gridLayout->addWidget(fftLowerButton, 7, 0, 1, 1);
+
+        fftUpperButton = new QPushButton(gridLayoutWidget);
+        fftUpperButton->setObjectName(QString::fromUtf8("fftUpperButton"));
+
+        gridLayout->addWidget(fftUpperButton, 8, 0, 1, 1);
+
+        fftLowerLabel = new QLabel(gridLayoutWidget);
+        fftLowerLabel->setObjectName(QString::fromUtf8("fftLowerLabel"));
+
+        gridLayout->addWidget(fftLowerLabel, 7, 1, 1, 1);
+
+        fftUpperLabel = new QLabel(gridLayoutWidget);
+        fftUpperLabel->setObjectName(QString::fromUtf8("fftUpperLabel"));
+
+        gridLayout->addWidget(fftUpperLabel, 8, 1, 1, 1);
 
 
         retranslateUi(SettingsDialog);
@@ -156,6 +180,10 @@ public:
         preAmpCheckBox->setText(QString());
         label_7->setText(QCoreApplication::translate("SettingsDialog", "Noise Threshold ", nullptr));
         label_8->setText(QCoreApplication::translate("SettingsDialog", "Alpha Value", nullptr));
+        fftLowerButton->setText(QCoreApplication::translate("SettingsDialog", "FFT Lower Range", nullptr));
+        fftUpperButton->setText(QCoreApplication::translate("SettingsDialog", "FFT Upper Range", nullptr));
+        fftLowerLabel->setText(QCoreApplication::translate("SettingsDialog", "TextLabel", nullptr));
+        fftUpperLabel->setText(QCoreApplication::translate("SettingsDialog", "TextLabel", nullptr));
     } // retranslateUi
 
 };

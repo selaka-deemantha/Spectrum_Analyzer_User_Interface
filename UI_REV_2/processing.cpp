@@ -186,6 +186,16 @@ void PlotWidget::setAlpha(int alpha_val){
     alpha = alpha_val;
 }
 
+void PlotWidget::setFFTLower(int fft_lower_temp){
+    fft_lower = fft_lower_temp;
+    emit fftBoundsChanged(fft_lower, fft_upper);
+}
+
+void PlotWidget::setFFTUpper(int fft_upper_temp){
+    fft_upper = fft_upper_temp;
+    emit fftBoundsChanged(fft_lower, fft_upper);
+}
+
 
 // ---------------- Getters ----------------
 bool PlotWidget::getAveragingEnabled() const { return averagingEnabled;}
@@ -193,4 +203,6 @@ int PlotWidget::getAveragingNumber() const { return averaging_number;}
 int PlotWidget::getAverageCount() const { return avg_count;}
 float PlotWidget::getNoiseThreshold() const { return noise_theshold;}
 int PlotWidget::getAlpha() const { return alpha;}
+int PlotWidget::getFFTLower() const { return fft_lower;}
+int PlotWidget::getFFTUpper() const { return fft_upper;}
 

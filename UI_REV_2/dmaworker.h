@@ -18,6 +18,7 @@ public slots:
     void start();
     void stop();
     void allowNextFrame();
+    void setFFTBounds(int lower, int upper);
 
 signals:
     //void newFFTData(uint32_t index, const std::vector<float>& fftData);
@@ -31,6 +32,10 @@ private:
     bool running = false;
     int fd = -1;
     bool readyForNext = true;
+
+    int fft_lower = 25;
+    int fft_upper = 89;
+
 
 };
 

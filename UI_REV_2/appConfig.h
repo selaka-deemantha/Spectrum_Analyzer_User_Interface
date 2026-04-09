@@ -24,9 +24,9 @@
 #define DB_MAX_RANGE 50
 #define DB_MIN_RANGE -150
 
-#define FFT_START 25
-#define FFT_END 89
-#define FFT_POINTS (FFT_END - FFT_START)
+#define FFT_START 70
+#define FFT_END 83
+#define FFT_POINTS (FFT_END - FFT_START + 1)
 #define NUM_SAMPLES 1024
 
 #define LINEAR_SCALE 7.98726e24f

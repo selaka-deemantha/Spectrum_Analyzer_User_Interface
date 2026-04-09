@@ -121,7 +121,7 @@ void PlotWidget::yscaleUpdate()
 //            maxVal = *std::max_element(plotData->begin() + viewStart, plotData->begin() + viewEnd);
 //            minVal = *std::min_element(plotData->begin() + viewStart, plotData->begin() + viewEnd);
 
-              maxVal = 1e21;
+              maxVal = 1e21/LINEAR_SCALE;
               minVal = 0;
         }
         return;
@@ -353,18 +353,14 @@ void PlotWidget::onNewFFTData(float noiseSpread_dB, float noiseSpread_Li, float 
 
 #endif
 
+    int fft_size = fft_upper - fft_lower + 1;
 
-    for(int i = 0; i < FFT_POINTS; ++i)
+    for(int i = 0; i < fft_size; ++i)
     {
         float magnitude = fft[i];
 
-        if(magnitude > peak_threshold)
-        {
-            is_Peak = true;
-        }
-        else {
-            is_Peak = false;
-        }
+        if(magnitude > peak_threshold) {is_Peak = true;}
+        else {is_Peak = false;}
 
         if(displayMode == dB)
         {

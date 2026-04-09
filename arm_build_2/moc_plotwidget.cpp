@@ -23,8 +23,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_PlotWidget_t {
-    QByteArrayData data[15];
-    char stringdata0[173];
+    QByteArrayData data[18];
+    char stringdata0[202];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -39,22 +39,25 @@ QT_MOC_LITERAL(2, 26, 0), // ""
 QT_MOC_LITERAL(3, 27, 12), // "peaksUpdated"
 QT_MOC_LITERAL(4, 40, 12), // "QList<float>"
 QT_MOC_LITERAL(5, 53, 10), // "peakValues"
-QT_MOC_LITERAL(6, 64, 12), // "onNewFFTData"
-QT_MOC_LITERAL(7, 77, 14), // "noiseSpread_dB"
-QT_MOC_LITERAL(8, 92, 14), // "noiseSpread_Li"
-QT_MOC_LITERAL(9, 107, 13), // "noiseFloor_dB"
-QT_MOC_LITERAL(10, 121, 13), // "noiseFloor_Li"
-QT_MOC_LITERAL(11, 135, 8), // "uint32_t"
-QT_MOC_LITERAL(12, 144, 5), // "index"
-QT_MOC_LITERAL(13, 150, 18), // "std::vector<float>"
-QT_MOC_LITERAL(14, 169, 3) // "fft"
+QT_MOC_LITERAL(6, 64, 16), // "fftBoundsChanged"
+QT_MOC_LITERAL(7, 81, 5), // "lower"
+QT_MOC_LITERAL(8, 87, 5), // "upper"
+QT_MOC_LITERAL(9, 93, 12), // "onNewFFTData"
+QT_MOC_LITERAL(10, 106, 14), // "noiseSpread_dB"
+QT_MOC_LITERAL(11, 121, 14), // "noiseSpread_Li"
+QT_MOC_LITERAL(12, 136, 13), // "noiseFloor_dB"
+QT_MOC_LITERAL(13, 150, 13), // "noiseFloor_Li"
+QT_MOC_LITERAL(14, 164, 8), // "uint32_t"
+QT_MOC_LITERAL(15, 173, 5), // "index"
+QT_MOC_LITERAL(16, 179, 18), // "std::vector<float>"
+QT_MOC_LITERAL(17, 198, 3) // "fft"
 
     },
     "PlotWidget\0frameProcessed\0\0peaksUpdated\0"
-    "QList<float>\0peakValues\0onNewFFTData\0"
-    "noiseSpread_dB\0noiseSpread_Li\0"
-    "noiseFloor_dB\0noiseFloor_Li\0uint32_t\0"
-    "index\0std::vector<float>\0fft"
+    "QList<float>\0peakValues\0fftBoundsChanged\0"
+    "lower\0upper\0onNewFFTData\0noiseSpread_dB\0"
+    "noiseSpread_Li\0noiseFloor_dB\0noiseFloor_Li\0"
+    "uint32_t\0index\0std::vector<float>\0fft"
 };
 #undef QT_MOC_LITERAL
 
@@ -64,26 +67,28 @@ static const uint qt_meta_data_PlotWidget[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-       3,   14, // methods
+       4,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       2,       // signalCount
+       3,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    0,   29,    2, 0x06 /* Public */,
-       3,    1,   30,    2, 0x06 /* Public */,
+       1,    0,   34,    2, 0x06 /* Public */,
+       3,    1,   35,    2, 0x06 /* Public */,
+       6,    2,   38,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       6,    6,   33,    2, 0x0a /* Public */,
+       9,    6,   43,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void,
     QMetaType::Void, 0x80000000 | 4,    5,
+    QMetaType::Void, QMetaType::Int, QMetaType::Int,    7,    8,
 
  // slots: parameters
-    QMetaType::Void, QMetaType::Float, QMetaType::Float, QMetaType::Float, QMetaType::Float, 0x80000000 | 11, 0x80000000 | 13,    7,    8,    9,   10,   12,   14,
+    QMetaType::Void, QMetaType::Float, QMetaType::Float, QMetaType::Float, QMetaType::Float, 0x80000000 | 14, 0x80000000 | 16,   10,   11,   12,   13,   15,   17,
 
        0        // eod
 };
@@ -96,7 +101,8 @@ void PlotWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         switch (_id) {
         case 0: _t->frameProcessed(); break;
         case 1: _t->peaksUpdated((*reinterpret_cast< const QList<float>(*)>(_a[1]))); break;
-        case 2: _t->onNewFFTData((*reinterpret_cast< float(*)>(_a[1])),(*reinterpret_cast< float(*)>(_a[2])),(*reinterpret_cast< float(*)>(_a[3])),(*reinterpret_cast< float(*)>(_a[4])),(*reinterpret_cast< uint32_t(*)>(_a[5])),(*reinterpret_cast< const std::vector<float>(*)>(_a[6]))); break;
+        case 2: _t->fftBoundsChanged((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 3: _t->onNewFFTData((*reinterpret_cast< float(*)>(_a[1])),(*reinterpret_cast< float(*)>(_a[2])),(*reinterpret_cast< float(*)>(_a[3])),(*reinterpret_cast< float(*)>(_a[4])),(*reinterpret_cast< uint32_t(*)>(_a[5])),(*reinterpret_cast< const std::vector<float>(*)>(_a[6]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
@@ -123,6 +129,13 @@ void PlotWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
             using _t = void (PlotWidget::*)(const QList<float> & );
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&PlotWidget::peaksUpdated)) {
                 *result = 1;
+                return;
+            }
+        }
+        {
+            using _t = void (PlotWidget::*)(int , int );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&PlotWidget::fftBoundsChanged)) {
+                *result = 2;
                 return;
             }
         }
@@ -158,13 +171,13 @@ int PlotWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 3)
+        if (_id < 4)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 3;
+        _id -= 4;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 3)
+        if (_id < 4)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 3;
+        _id -= 4;
     }
     return _id;
 }
@@ -180,6 +193,13 @@ void PlotWidget::peaksUpdated(const QList<float> & _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
     QMetaObject::activate(this, &staticMetaObject, 1, _a);
+}
+
+// SIGNAL 2
+void PlotWidget::fftBoundsChanged(int _t1, int _t2)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))) };
+    QMetaObject::activate(this, &staticMetaObject, 2, _a);
 }
 QT_WARNING_POP
 QT_END_MOC_NAMESPACE

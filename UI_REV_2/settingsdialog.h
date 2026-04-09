@@ -20,7 +20,9 @@ public:
         int         averagingNumber     = 1,
         float       noise_thresh        = 0.0f,
         bool        preAmpEnabled       = false,
-        int         alpha_value         = 1
+        int         alpha_value         = 1,
+        int         fft_lower_1         = 25,
+        int         fft_upper_1         = 89
                                                 );
 
     ~SettingsDialog();
@@ -31,6 +33,12 @@ public:
         int        averagingNumber() const;
         float      noiseThreshold() const;
         int        alphaValue() const;
+        int        fftLower() const;
+        int        fftUpper() const;
+
+
+        int        fft_lower = 25;
+        int        fft_upper = 89;
 
 private:
         Ui::SettingsDialog *ui;

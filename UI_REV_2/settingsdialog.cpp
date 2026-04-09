@@ -1,5 +1,8 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
+#include "numpaddialog.h"
+#include <QPushButton>
+#include <QDebug>
 
 SettingsDialog::SettingsDialog(QWidget *parent,
                                 int samplingMethod,
@@ -8,7 +11,9 @@ SettingsDialog::SettingsDialog(QWidget *parent,
                                 int averagingNumber,
                                 float noise_thresh,
                                 bool preAmpEnabled,
-                                int alphaValue) :
+                                int alphaValue,
+                                int fft_lower_1,
+                                int fft_upper_1) :
     QDialog(parent),
     ui(new Ui::SettingsDialog)
 {
@@ -42,6 +47,31 @@ SettingsDialog::SettingsDialog(QWidget *parent,
       ui->alphaSpinBox->setValue(alphaValue);
 
       ui->noiseThresholdSpinBox->setValue(noise_thresh);
+
+      ui->fftLowerLabel->setText(QString::number(fft_lower_1, 'f', 0) + " Hz");
+      ui->fftUpperLabel->setText(QString::number(fft_upper_1, 'f', 0) + " Hz");
+
+      connect(ui->fftLowerButton, &QPushButton::clicked, this, [this]() {
+          NumPadDialog dialog(this);
+          dialog.setTitle("Enter Lower Frequency");
+
+          if(dialog.exec() == QDialog::Accepted)
+          {
+              fft_lower = dialog.value();
+              ui->fftLowerLabel->setText(QString::number(fft_lower, 'f', 0) + " Hz");
+          }
+      });
+
+      connect(ui->fftUpperButton, &QPushButton::clicked, this, [this]() {
+          NumPadDialog dialog(this);
+          dialog.setTitle("Enter Upper Frequency");
+
+          if(dialog.exec() == QDialog::Accepted)
+          {
+              fft_upper = dialog.value();
+              ui->fftUpperLabel->setText(QString::number(fft_upper, 'f', 0) + " Hz");
+          }
+      });
 
 
 }
@@ -77,6 +107,15 @@ float SettingsDialog::noiseThreshold() const {
 
 int SettingsDialog::alphaValue() const {
     return ui->alphaSpinBox->value();
+}
+
+
+int SettingsDialog::fftLower() const {
+    return fft_lower;
+}
+
+int SettingsDialog::fftUpper() const {
+    return fft_upper;
 }
 
 
