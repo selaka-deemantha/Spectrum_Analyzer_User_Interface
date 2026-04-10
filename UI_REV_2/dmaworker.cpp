@@ -97,6 +97,7 @@ void DMAWorker::readDMASamples()
     emit newFFTData(0.0f, 0.0f, 0.0f, 0.0f, test_freq_index, fft);
 
     test_freq_index = (test_freq_index + 1) % NUM_SAMPLES;
+    qDebug() << fft_lower << fft_upper << "yoooooooooooo";
 
 #else
 
@@ -121,7 +122,7 @@ void DMAWorker::readDMASamples()
     {
         float val;
         std::memcpy(&val, &raw_buf[i + fft_lower], sizeof(float));
-        fft[i] = val / LINEAR_SCALE;
+        fft[i] = val;
     }
 
     float noiseSum_dB = 0.0f;
@@ -168,7 +169,4 @@ void DMAWorker::setFFTBounds(int lower, int upper)
 {
     fft_lower = lower;
     fft_upper = upper;
-
-    // Optional: debug
-    qDebug() << "DMAWorker received new FFT bounds:" << fft_lower << fft_upper;
 }

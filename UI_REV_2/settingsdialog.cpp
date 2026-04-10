@@ -48,8 +48,10 @@ SettingsDialog::SettingsDialog(QWidget *parent,
 
       ui->noiseThresholdSpinBox->setValue(noise_thresh);
 
-      ui->fftLowerLabel->setText(QString::number(fft_lower_1, 'f', 0) + " Hz");
-      ui->fftUpperLabel->setText(QString::number(fft_upper_1, 'f', 0) + " Hz");
+      fft_lower = fft_lower_1;
+      fft_upper = fft_upper_1;
+      ui->fftLowerLabel->setText(QString::number(fft_lower, 'f', 0) + " Hz");
+      ui->fftUpperLabel->setText(QString::number(fft_upper, 'f', 0) + " Hz");
 
       connect(ui->fftLowerButton, &QPushButton::clicked, this, [this]() {
           NumPadDialog dialog(this);

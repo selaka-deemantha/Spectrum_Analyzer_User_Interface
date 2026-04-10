@@ -188,11 +188,25 @@ void PlotWidget::setAlpha(int alpha_val){
 
 void PlotWidget::setFFTLower(int fft_lower_temp){
     fft_lower = fft_lower_temp;
+    int fft_size = fft_upper - fft_lower + 1;
+    if (fft_size <= 0) fft_size = 1;
+    if (segments > 0) {
+        data.resize(fft_size * segments);
+        data.fill(0.0f);
+        viewEnd = data.size();
+    }
     emit fftBoundsChanged(fft_lower, fft_upper);
 }
 
 void PlotWidget::setFFTUpper(int fft_upper_temp){
     fft_upper = fft_upper_temp;
+    int fft_size = fft_upper - fft_lower + 1;
+    if (fft_size <= 0) fft_size = 1;
+    if (segments > 0) {
+        data.resize(fft_size * segments);
+        data.fill(0.0f);
+        viewEnd = data.size();
+    }
     emit fftBoundsChanged(fft_lower, fft_upper);
 }
 

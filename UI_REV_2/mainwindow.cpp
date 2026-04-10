@@ -85,7 +85,7 @@ int MainWindow::freq_to_index(uint32_t freq_mhz)
         return -1;
     }
 
-    return (freq_mhz - FREQ_START_MHZ) / FREQ_STEP_MHZ;
+    return (freq_mhz - FREQ_START_MHZ);
 }
 
 void MainWindow::updateSpanLabel()
@@ -139,7 +139,7 @@ void MainWindow::onStepSizeButtonPressed()
 
 void MainWindow::onEnterButtonPressed()
 {
-    int step_idx  = step_freq / FREQ_STEP_MHZ;
+    int step_idx  = step_freq;
     int start_idx = freq_to_index(start_freq);
     int stop_idx  = freq_to_index(stop_freq)-step_idx;
 
@@ -157,12 +157,12 @@ void MainWindow::onEnterButtonPressed()
         return;
     }
 
-    if (step_freq % 5 != 0)
-    {
-        QMessageBox::warning(nullptr, "Invalid frequency step",
-                             QString("The frequency step (%1 MHz) must be a multiple of 5.").arg(step_freq));
-        return;
-    }
+//    if (step_freq % 5 != 0)
+//    {
+//        QMessageBox::warning(nullptr, "Invalid frequency step",
+//                             QString("The frequency step (%1 MHz) must be a multiple of 5.").arg(step_freq));
+//        return;
+//    }
 #if DEBUG_MSG
     qDebug() << "START_IDX =" << start_idx << "STOP_IDX ="  << stop_idx << "STEP_IDX ="  << step_idx;
 #endif
@@ -184,7 +184,7 @@ void MainWindow::onEnterButtonPressed()
     uint32_t data[4] = {
         static_cast<uint32_t>(start_idx),
         static_cast<uint32_t>(stop_idx),
-        static_cast<uint32_t>(step_idx),
+        static_cast<uint32_t>(1),
         static_cast<uint32_t>(1)
     };
 

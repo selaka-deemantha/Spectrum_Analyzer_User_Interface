@@ -28,6 +28,7 @@ PlotWidget::PlotWidget(QWidget *parent) : QWidget(parent)
     connect(dmaThread, &QThread::finished, dmaWorker, &QObject::deleteLater);
     connect(dmaWorker, &DMAWorker::newFFTData, this, &PlotWidget::onNewFFTData);
     connect(this, &PlotWidget::frameProcessed, dmaWorker, &DMAWorker::allowNextFrame, Qt::QueuedConnection);
+    connect(this, &PlotWidget::fftBoundsChanged, dmaWorker, &DMAWorker::setFFTBounds, Qt::QueuedConnection);
 }
 
 PlotWidget::~PlotWidget()
@@ -53,7 +54,10 @@ void PlotWidget::startAcquisition(uint32_t minF, uint32_t maxF, uint32_t step)
     segments = (maxFreq - minFreq) / stepSize;
     if(segments <= 0) segments = 1;
 
-    data.resize(FFT_POINTS * segments);
+    int fft_size = fft_upper - fft_lower + 1;
+    if (fft_size <= 0) fft_size = 1;
+
+    data.resize(fft_size * segments);
     data.fill(0.0f);
     viewStart = 0;
     viewEnd = data.size();
@@ -118,10 +122,10 @@ void PlotWidget::yscaleUpdate()
 
         }
         else {
-//            maxVal = *std::max_element(plotData->begin() + viewStart, plotData->begin() + viewEnd);
-//            minVal = *std::min_element(plotData->begin() + viewStart, plotData->begin() + viewEnd);
+            maxVal = *std::max_element(plotData->begin() + viewStart, plotData->begin() + viewEnd);
+            minVal = *std::min_element(plotData->begin() + viewStart, plotData->begin() + viewEnd);
 
-              maxVal = 1e21/LINEAR_SCALE;
+              maxVal = 1e21;
               minVal = 0;
         }
         return;
@@ -155,9 +159,10 @@ void PlotWidget::paintEvent(QPaintEvent *)
     float w = width() - leftMargin;
     float h = height() - bottomMargin;
 
-    // segment divider lines //
+     // segment divider lines //
 //    if (showSegments && plotData != nullptr)
 //    {
+
 //        painter.setPen(QPen(QColor(120,120,120), 1, Qt::DashLine));
 
 //        int totalPoints = plotData->size();
@@ -179,15 +184,14 @@ void PlotWidget::paintEvent(QPaintEvent *)
 //        }
 //    }
 
-    //
-
-
-
-
-    if(is_Peak)
-        painter.setPen(QPen(Qt::red, 2));
-    else
+    if (is_Peak){
         painter.setPen(QPen(Qt::green, 2));
+    }
+    else {
+        painter.setPen(QPen(Qt::red, 2));
+    }
+
+
 
     float range = maxVal - minVal;
     if(range < 0.0001f) range = 1.0f;
@@ -317,7 +321,6 @@ void PlotWidget::onNewFFTData(float noiseSpread_dB, float noiseSpread_Li, float 
 {
     // Use sequential indexing to avoid duplicate overwrites
     uint32_t plot_index = index % segments;
-    int offset = plot_index * FFT_POINTS;
     float peak_threshold = noiseFloor_Li + alpha * noiseSpread_Li;
 
 #if DMA_WRITE_FILE
@@ -354,30 +357,46 @@ void PlotWidget::onNewFFTData(float noiseSpread_dB, float noiseSpread_Li, float 
 #endif
 
     int fft_size = fft_upper - fft_lower + 1;
+    if (fft_size <= 0) {
+        fft_size = 1;
+    }
+
+    int offset = plot_index * fft_size;
+    if (offset + fft_size > data.size()) {
+        // protect against unexpected size mismatch
+        return;
+    }
+    if (noiseFloor_dB >= 130){
+        is_Peak = true;
+    }
+    else {
+        is_Peak = false;
+    }
 
     for(int i = 0; i < fft_size; ++i)
     {
         float magnitude = fft[i];
 
-        if(magnitude > peak_threshold) {is_Peak = true;}
-        else {is_Peak = false;}
+        float value;
 
         if(displayMode == dB)
         {
-            float mag_dB = 10.0f * std::log10(magnitude + 1e-12f);
-
-            if (magnitude >= peak_threshold) {
-                data[offset + i] = mag_dB + 50.0f;
-            }
-            else {
-                data[offset + i] = mag_dB - noiseFloor_dB + 50.0f;
-            }
+            value = 10.0f * std::log10(magnitude + 1e-12f);
+            data[offset + i] = value;
         }
         else
         {
-            data[offset + i] = magnitude;
+            value = magnitude;
+            data[offset + i] = value;
+        }
+
+        if(value > max_value)
+        {
+            max_value = value;
+            max_bin = i;
         }
     }
+
 
 
     if(averagingEnabled){
