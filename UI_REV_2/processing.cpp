@@ -210,6 +210,17 @@ void PlotWidget::setFFTUpper(int fft_upper_temp){
     emit fftBoundsChanged(fft_lower, fft_upper);
 }
 
+void PlotWidget::setdBThreshold(float dB_thresh){
+    dB_Threshold = dB_thresh;
+}
+
+void PlotWidget::setdBReduction(float dB_redu){
+    dB_Reduction = dB_redu;
+}
+
+void PlotWidget::setdBScale(float dB_scale_in){
+    dB_scale_offset = dB_scale_in;
+}
 
 // ---------------- Getters ----------------
 bool PlotWidget::getAveragingEnabled() const { return averagingEnabled;}
@@ -219,4 +230,8 @@ float PlotWidget::getNoiseThreshold() const { return noise_theshold;}
 int PlotWidget::getAlpha() const { return alpha;}
 int PlotWidget::getFFTLower() const { return fft_lower;}
 int PlotWidget::getFFTUpper() const { return fft_upper;}
+float PlotWidget::getdBThreshold() const { return dB_Threshold;}
+float PlotWidget::getdBReduction() const { return dB_Reduction;}
+float PlotWidget::getdBScale() const { return dB_scale_offset;}
+
 

@@ -47,6 +47,14 @@ public:
     QPushButton *fftUpperButton;
     QLabel *fftLowerLabel;
     QLabel *fftUpperLabel;
+    QWidget *gridLayoutWidget_2;
+    QGridLayout *gridLayout_2;
+    QLabel *dBThresholdLabel;
+    QPushButton *dBReductionButton;
+    QLabel *dBReductionLabel;
+    QPushButton *dBThresholdButton;
+    QPushButton *dBScaleButton;
+    QLabel *dBScaleLabel;
 
     void setupUi(QDialog *SettingsDialog)
     {
@@ -160,6 +168,42 @@ public:
 
         gridLayout->addWidget(fftUpperLabel, 8, 1, 1, 1);
 
+        gridLayoutWidget_2 = new QWidget(SettingsDialog);
+        gridLayoutWidget_2->setObjectName(QString::fromUtf8("gridLayoutWidget_2"));
+        gridLayoutWidget_2->setGeometry(QRect(10, 390, 281, 161));
+        gridLayout_2 = new QGridLayout(gridLayoutWidget_2);
+        gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
+        gridLayout_2->setContentsMargins(0, 0, 0, 0);
+        dBThresholdLabel = new QLabel(gridLayoutWidget_2);
+        dBThresholdLabel->setObjectName(QString::fromUtf8("dBThresholdLabel"));
+
+        gridLayout_2->addWidget(dBThresholdLabel, 0, 1, 1, 1);
+
+        dBReductionButton = new QPushButton(gridLayoutWidget_2);
+        dBReductionButton->setObjectName(QString::fromUtf8("dBReductionButton"));
+
+        gridLayout_2->addWidget(dBReductionButton, 1, 0, 1, 1);
+
+        dBReductionLabel = new QLabel(gridLayoutWidget_2);
+        dBReductionLabel->setObjectName(QString::fromUtf8("dBReductionLabel"));
+
+        gridLayout_2->addWidget(dBReductionLabel, 1, 1, 1, 1);
+
+        dBThresholdButton = new QPushButton(gridLayoutWidget_2);
+        dBThresholdButton->setObjectName(QString::fromUtf8("dBThresholdButton"));
+
+        gridLayout_2->addWidget(dBThresholdButton, 0, 0, 1, 1);
+
+        dBScaleButton = new QPushButton(gridLayoutWidget_2);
+        dBScaleButton->setObjectName(QString::fromUtf8("dBScaleButton"));
+
+        gridLayout_2->addWidget(dBScaleButton, 2, 0, 1, 1);
+
+        dBScaleLabel = new QLabel(gridLayoutWidget_2);
+        dBScaleLabel->setObjectName(QString::fromUtf8("dBScaleLabel"));
+
+        gridLayout_2->addWidget(dBScaleLabel, 2, 1, 1, 1);
+
 
         retranslateUi(SettingsDialog);
 
@@ -184,6 +228,12 @@ public:
         fftUpperButton->setText(QCoreApplication::translate("SettingsDialog", "FFT Upper Range", nullptr));
         fftLowerLabel->setText(QCoreApplication::translate("SettingsDialog", "TextLabel", nullptr));
         fftUpperLabel->setText(QCoreApplication::translate("SettingsDialog", "TextLabel", nullptr));
+        dBThresholdLabel->setText(QCoreApplication::translate("SettingsDialog", "TextLabel", nullptr));
+        dBReductionButton->setText(QCoreApplication::translate("SettingsDialog", "dB Reduction", nullptr));
+        dBReductionLabel->setText(QCoreApplication::translate("SettingsDialog", "TextLabel", nullptr));
+        dBThresholdButton->setText(QCoreApplication::translate("SettingsDialog", "dB Threshold", nullptr));
+        dBScaleButton->setText(QCoreApplication::translate("SettingsDialog", "dB Scale Offset", nullptr));
+        dBScaleLabel->setText(QCoreApplication::translate("SettingsDialog", "TextLabel", nullptr));
     } // retranslateUi
 
 };

@@ -296,7 +296,10 @@ void MainWindow::onSettingsButtonPressed()
                        pre_amp_enabled,
                        ui->plotWidget->getAlpha(),
                        ui->plotWidget->getFFTLower(),
-                       ui->plotWidget->getFFTUpper());
+                       ui->plotWidget->getFFTUpper(),
+                       ui->plotWidget->getdBThreshold(),
+                       ui->plotWidget->getdBReduction(),
+                       ui->plotWidget->getdBScale());
 
     if (dlg.exec() == QDialog::Accepted)
     {
@@ -309,6 +312,9 @@ void MainWindow::onSettingsButtonPressed()
         int alpha_value         = dlg.alphaValue();
         int fft_lower           = dlg.fftLower();
         int fft_upper           = dlg.fftUpper();
+        float dB_threshold      = dlg.dBThreshold();
+        float dB_reduction      = dlg.dBReduction();
+        float dB_scale_temp     = dlg.dBScale();
 
 
         if (sampling_method == 0){
@@ -332,6 +338,9 @@ void MainWindow::onSettingsButtonPressed()
         ui->plotWidget->setAlpha(alpha_value);
         ui->plotWidget->setFFTLower(fft_lower);
         ui->plotWidget->setFFTUpper(fft_upper);
+        ui->plotWidget->setdBThreshold(dB_threshold);
+        ui->plotWidget->setdBReduction(dB_reduction);
+        ui->plotWidget->setdBScale(dB_scale_temp);
 
         if (pre_amp_enabled) {
             QProcess::execute("devmem", QStringList() << "0x41200000" << "w" << "0x1");

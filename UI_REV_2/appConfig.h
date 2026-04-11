@@ -21,8 +21,8 @@
 #define INDEX_BASED 1
 
 #define DB_DYNAMIC_RANGE 0
-#define DB_MAX_RANGE 250
-#define DB_MIN_RANGE -70
+#define DB_MAX_RANGE 185
+#define DB_MIN_RANGE 80
 
 #define FFT_START 70
 #define FFT_END 83

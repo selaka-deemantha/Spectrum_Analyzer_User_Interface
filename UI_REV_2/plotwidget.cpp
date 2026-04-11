@@ -159,7 +159,7 @@ void PlotWidget::paintEvent(QPaintEvent *)
     float w = width() - leftMargin;
     float h = height() - bottomMargin;
 
-     // segment divider lines //
+      //segment divider lines //
 //    if (showSegments && plotData != nullptr)
 //    {
 
@@ -184,14 +184,7 @@ void PlotWidget::paintEvent(QPaintEvent *)
 //        }
 //    }
 
-    if (is_Peak){
-        painter.setPen(QPen(Qt::green, 2));
-    }
-    else {
-        painter.setPen(QPen(Qt::red, 2));
-    }
-
-
+    painter.setPen(QPen(Qt::green, 2));
 
     float range = maxVal - minVal;
     if(range < 0.0001f) range = 1.0f;
@@ -241,19 +234,19 @@ void PlotWidget::paintEvent(QPaintEvent *)
     painter.setPen(Qt::yellow);
     painter.setFont(QFont("Arial",15,QFont::Bold));
 
-    for(int k=0;k<std::min(3,(int)peaks.size());k++){
+//    for(int k=0;k<std::min(3,(int)peaks.size());k++){
 
-        float val = peaks[k].first;
-        int idx = peaks[k].second;
+//        float val = peaks[k].first;
+//        int idx = peaks[k].second;
 
-        topValues.append(idx + 24);
+//        topValues.append(idx + 24);
 
-        float px = leftMargin + (idx - viewStart) * w / visiblePoints;
-        float py = h - ((val - minVal)/range)*h;
+//        float px = leftMargin + (idx - viewStart) * w / visiblePoints;
+//        float py = h - ((val - minVal)/range)*h;
 
-        painter.drawText(QPointF(px,py-10),QString::number(k+1));
-        painter.drawEllipse(QPointF(px,py),3,3);
-    }
+//        painter.drawText(QPointF(px,py-10),QString::number(k+1));
+//        painter.drawEllipse(QPointF(px,py),3,3);
+//    }
 
     emit peaksUpdated(topValues);
 
@@ -291,7 +284,7 @@ void PlotWidget::paintEvent(QPaintEvent *)
         // calculate value in the current display mode
         float val;
         if(displayMode == dB) {
-            val = minVal + (i / (float)vDivisions) * (maxVal - minVal);
+            val = minVal + (i / (float)vDivisions) * (maxVal - minVal) - dB_scale_offset;
             painter.drawText(5, y, QString::number(val, 'f', 1)); // 1 decimal for dB
         }
         else { // linear
@@ -382,6 +375,9 @@ void PlotWidget::onNewFFTData(float noiseSpread_dB, float noiseSpread_Li, float 
         if(displayMode == dB)
         {
             value = 10.0f * std::log10(magnitude + 1e-12f);
+            if (value >= dB_Threshold){
+                value = value - dB_Reduction;
+            }
             data[offset + i] = value;
         }
         else
@@ -390,11 +386,7 @@ void PlotWidget::onNewFFTData(float noiseSpread_dB, float noiseSpread_Li, float 
             data[offset + i] = value;
         }
 
-        if(value > max_value)
-        {
-            max_value = value;
-            max_bin = i;
-        }
+
     }
 
 

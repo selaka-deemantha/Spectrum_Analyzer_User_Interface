@@ -68,6 +68,9 @@ public:
     void setAlpha(int number);
     void setFFTLower(int number);
     void setFFTUpper(int numner);
+    void setdBThreshold(float number);
+    void setdBReduction(float number);
+    void setdBScale(float number);
 
 
     // Getters
@@ -78,6 +81,9 @@ public:
     int getAlpha() const;
     int getFFTLower() const;
     int getFFTUpper() const;
+    float getdBThreshold() const;
+    float getdBReduction() const;
+    float getdBScale() const;
 
 public slots:
     void onNewFFTData(float noiseSpread_dB, float noiseSpread_Li, float noiseFloor_dB, float noiseFloor_Li, uint32_t index, const std::vector<float>& fft);
@@ -152,6 +158,9 @@ private:
     int fft_lower = 25;
     int fft_upper = 89;
 
+    float dB_Threshold = 130;
+    float dB_Reduction = 30;
+    float dB_scale_offset = 0;
 
     QThread* dmaThread = new QThread();
     DMAWorker* dmaWorker = new DMAWorker();

@@ -22,7 +22,10 @@ public:
         bool        preAmpEnabled       = false,
         int         alpha_value         = 1,
         int         fft_lower_1         = 25,
-        int         fft_upper_1         = 89
+        int         fft_upper_1         = 89,
+        float       dB_threshold        = 130,
+        float       dB_reduction        = 30,
+        float       dB_scale            = 0
                                                 );
 
     ~SettingsDialog();
@@ -35,10 +38,17 @@ public:
         int        alphaValue() const;
         int        fftLower() const;
         int        fftUpper() const;
+        float      dBThreshold() const;
+        float      dBReduction() const;
+        float      dBScale() const;
 
 
         int        fft_lower = 25;
         int        fft_upper = 89;
+
+        float      dB_threshold = 130;
+        float      dB_reduction = 30;
+        float      dB_scale = 0;
 
 private:
         Ui::SettingsDialog *ui;
