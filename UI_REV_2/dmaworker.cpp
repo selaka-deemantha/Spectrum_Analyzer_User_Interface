@@ -121,7 +121,7 @@ void DMAWorker::readDMASamples()
     for (int i = 0; i < fft_points; ++i)
     {
         float val;
-        std::memcpy(&val, &raw_buf[i + fft_lower], sizeof(float));
+        std::memcpy(&val, &raw_buf[fft_upper - i], sizeof(float));
         fft[i] = val;
     }
 

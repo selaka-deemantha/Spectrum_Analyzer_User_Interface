@@ -162,6 +162,11 @@ private:
     float dB_Reduction = 30;
     float dB_scale_offset = 0;
 
+    int avg_rounds = 0;
+
+    QVector<float> avgData;
+    int avg_count_1 = 0;
+
     QThread* dmaThread = new QThread();
     DMAWorker* dmaWorker = new DMAWorker();
 

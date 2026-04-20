@@ -64,6 +64,12 @@ void PlotWidget::startAcquisition(uint32_t minF, uint32_t maxF, uint32_t step)
     currentStepIndex = 0;
     autosetEnabled = false;
 
+    avg_rounds = 0;
+
+    avgData.resize(fft_size * segments);
+    std::fill(avgData.begin(), avgData.end(), 0.0f);
+    avg_count_1 = 0;
+
     if(!dmaThread->isRunning())
         dmaThread->start();
     QMetaObject::invokeMethod(dmaWorker, "start", Qt::QueuedConnection);
@@ -234,19 +240,19 @@ void PlotWidget::paintEvent(QPaintEvent *)
     painter.setPen(Qt::yellow);
     painter.setFont(QFont("Arial",15,QFont::Bold));
 
-//    for(int k=0;k<std::min(3,(int)peaks.size());k++){
+    for(int k=0;k<std::min(3,(int)peaks.size());k++){
 
-//        float val = peaks[k].first;
-//        int idx = peaks[k].second;
+        float val = peaks[k].first;
+        int idx = peaks[k].second;
 
-//        topValues.append(idx + 24);
+        topValues.append(idx + fft_lower);
 
-//        float px = leftMargin + (idx - viewStart) * w / visiblePoints;
-//        float py = h - ((val - minVal)/range)*h;
+        float px = leftMargin + (idx - viewStart) * w / visiblePoints;
+        float py = h - ((val - minVal)/range)*h;
 
-//        painter.drawText(QPointF(px,py-10),QString::number(k+1));
-//        painter.drawEllipse(QPointF(px,py),3,3);
-//    }
+        painter.drawText(QPointF(px,py-10),QString::number(k+1));
+        painter.drawEllipse(QPointF(px,py),3,3);
+    }
 
     emit peaksUpdated(topValues);
 
@@ -316,6 +322,8 @@ void PlotWidget::onNewFFTData(float noiseSpread_dB, float noiseSpread_Li, float 
     uint32_t plot_index = index % segments;
     float peak_threshold = noiseFloor_Li + alpha * noiseSpread_Li;
 
+
+
 #if DMA_WRITE_FILE
     static QFile file("fft_summary.txt");
     static bool firstWrite = true;  // to write header once
@@ -366,50 +374,121 @@ void PlotWidget::onNewFFTData(float noiseSpread_dB, float noiseSpread_Li, float 
         is_Peak = false;
     }
 
+    float alpha = 0.15f;  // tune this (0.1–0.2 is good)
+
     for(int i = 0; i < fft_size; ++i)
     {
         float magnitude = fft[i];
-
         float value;
+        int idx = offset + i;
 
         if(displayMode == dB)
         {
-            value = 10.0f * std::log10(magnitude + 1e-12f);
-            if (value >= dB_Threshold){
-                value = value - dB_Reduction;
+            if (dB_Reduction == 10){
+              value = 10.0f * std::log10(magnitude + 1e-12f) - noiseFloor_dB + 50.0f;
             }
-            data[offset + i] = value;
+            else {
+                value = 10.0f * std::log10(magnitude + 1e-12f);
+            }
+
+
+
+//            if (value >= dB_Threshold){
+//                value = value - noiseFloor_dB + 50.0f;
+//            }
+//            else {
+
+//            }
+//                value -= dB_Reduction;
+
+
+            if (avg_count_1 == 0)
+            {
+                avgData[idx] = value;  // first sweep
+            }
+            else
+            {
+                avgData[idx] = alpha * value + (1.0f - alpha) * avgData[idx];
+            }
         }
         else
         {
             value = magnitude;
-            data[offset + i] = value;
+            data[idx] = value;
         }
-
-
     }
 
-
-
-    if(averagingEnabled){
-#if INDEX_BASED
-        if (plot_index == 0){
-            NormalAveraging();
-        }
-
-#else
-        if (currentStepIndex == segments - 1){
-            NormalAveraging();
-            update();
-        }
-#endif
+    if(displayMode == dB)
+    {
+        plotData = &avgData;
     }
-
-    else {
+    else
+    {
         plotData = &data;
-        update();
+    }
+
+    update();
+
+    if (displayMode == dB){
+        if (plot_index == segments - 1)
+        {
+            avg_count_1++;
+        }
 
     }
+
+
+
+
+//    for(int i = 0; i < fft_size; ++i)
+//    {
+//        float magnitude = fft[i];
+
+//        float value;
+
+//        if(displayMode == dB)
+//        {
+//            value = 10.0f * std::log10(magnitude + 1e-12f);
+//            if (value >= dB_Threshold){
+//                value = value - dB_Reduction;
+//            }
+//            //data[offset + i] = value;
+//            data[offset + i] = value;
+
+//        }
+//        else
+//        {
+//            value = magnitude;
+//            data[offset + i] = value;
+//        }
+
+//    }
+
+//    if (plot_index == segments - 1)  // full sweep complete
+//    {
+//        int total_size = fft_size * segments;
+
+//        if (avg_count_1 == 0)
+//        {
+//            avgData = data;  // first frame copy
+//        }
+//        else
+//        {
+//            for(int i = 0; i < total_size; i++)
+//            {
+//                avgData[i] = (avgData[i] * avg_count_1 + data[i]) / (avg_count_1 + 1);
+//            }
+//        }
+
+//        avg_count_1++;
+
+//        plotData = &avgData;
+//        update();
+//    }
+
+
+//    plotData = &data;
+//    update();
 
     emit frameProcessed();
 

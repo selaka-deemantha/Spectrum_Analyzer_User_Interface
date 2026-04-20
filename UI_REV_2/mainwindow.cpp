@@ -253,19 +253,21 @@ void MainWindow::onResetButtonPressed()
 
 void MainWindow::updatePeakDisplay(const QList<float>& peakValues)
 {
+
+    // arg((start_freq + 5000) - (0.078125 * peakValues[0] + 288 + 4706)  , 0, 'f', 2)
     if (peakValues.size() >= 1)
         ui->peak1_label->setText(
-            QString("1: %1 MHz").arg(start_freq + (0.078125 * peakValues[0]) * step_freq / FREQ_STEP_MHZ, 0, 'f', 2)
+            QString("1: %1 MHz").arg(0.078125 * peakValues[0] + 288 + 4696 + start_freq - 4990)  , 0, 'f', 2)
         );
 
     if (peakValues.size() >= 2)
         ui->peak2_label->setText(
-            QString("2: %1 MHz").arg(start_freq + (0.078125 * peakValues[1]) * step_freq / FREQ_STEP_MHZ, 0, 'f', 2)
+            QString("2: %1 MHz").arg(0.078125 * peakValues[1] + 288 + 4696 + start_freq - 4990)  , 0, 'f', 2)
         );
 
     if (peakValues.size() >= 3)
         ui->peak3_label->setText(
-            QString("3: %1 MHz").arg(start_freq + (0.078125 * peakValues[2]) * step_freq / FREQ_STEP_MHZ, 0, 'f', 2)
+            QString("3: %1 MHz").arg(0.078125 * peakValues[2] + 288 + 4696 + start_freq - 4990)  , 0, 'f', 2)
         );
 }
 
