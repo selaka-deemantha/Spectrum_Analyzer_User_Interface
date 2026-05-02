@@ -1,0 +1,10 @@
+
+
+OPTION psf_version = 2.1;
+
+BEGIN DRIVER vco_ctrl_axi_lite
+	OPTION supported_peripherals = (vco_ctrl_axi_lite);
+	OPTION copyfiles = all;
+	OPTION VERSION = 1.0;
+	OPTION NAME = vco_ctrl_axi_lite;
+END DRIVER

@@ -1,0 +1,57 @@
+{
+   "ActiveEmotionalView":"Default View",
+   "Default View_ScaleFactor":"0.441942",
+   "Default View_TopLeft":"-104,-45",
+   "ExpandedHierarchyInLayout":"",
+   "guistr":"# # String gsaved with Nlview 7.8.0 2024-04-26 e1825d835c VDI=44 GEI=38 GUI=JA:21.0 TLS
+#  -string -flagsOSRD
+preplace port DDR -pg 1 -lvl 6 -x 2020 -y 300 -defaultsOSRD
+preplace port FIXED_IO -pg 1 -lvl 6 -x 2020 -y 320 -defaultsOSRD
+preplace port port-id_hsync -pg 1 -lvl 6 -x 2020 -y 840 -defaultsOSRD
+preplace port port-id_vsync -pg 1 -lvl 6 -x 2020 -y 860 -defaultsOSRD
+preplace portBus red -pg 1 -lvl 6 -x 2020 -y 780 -defaultsOSRD
+preplace portBus green -pg 1 -lvl 6 -x 2020 -y 800 -defaultsOSRD
+preplace portBus blue -pg 1 -lvl 6 -x 2020 -y 820 -defaultsOSRD
+preplace inst processing_system7_0 -pg 1 -lvl 5 -x 1760 -y 400 -defaultsOSRD
+preplace inst axi_smc -pg 1 -lvl 2 -x 540 -y 320 -defaultsOSRD
+preplace inst rst_ps7_0_100M -pg 1 -lvl 1 -x 210 -y 500 -defaultsOSRD
+preplace inst axi_vdma_0 -pg 1 -lvl 3 -x 940 -y 130 -defaultsOSRD
+preplace inst v_axi4s_vid_out_0 -pg 1 -lvl 4 -x 1350 -y 690 -defaultsOSRD
+preplace inst axi_dynclk_0 -pg 1 -lvl 3 -x 940 -y 370 -defaultsOSRD
+preplace inst v_tc_0 -pg 1 -lvl 3 -x 940 -y 650 -defaultsOSRD
+preplace inst xlconstant_0 -pg 1 -lvl 2 -x 540 -y 490 -defaultsOSRD
+preplace inst rgb2vga_0 -pg 1 -lvl 5 -x 1760 -y 820 -defaultsOSRD
+preplace inst axi_mem_intercon -pg 1 -lvl 4 -x 1350 -y 120 -defaultsOSRD
+preplace netloc processing_system7_0_FCLK_CLK0 1 0 6 30 320 390 230 710 10 1190 250 1530 230 2000
+preplace netloc processing_system7_0_FCLK_RESET0_N 1 0 6 30 600 NJ 600 690J 470 NJ 470 1520J 560 1990
+preplace netloc rst_ps7_0_100M_peripheral_aresetn 1 1 3 400 400 720 20 1160
+preplace netloc axi_dynclk_0_PXL_CLK_O 1 2 3 740 480 1150 830 NJ
+preplace netloc xlconstant_0_dout 1 2 2 700 490 1140
+preplace netloc v_axi4s_vid_out_0_vtg_ce 1 2 3 730 500 NJ 500 1510
+preplace netloc rgb2vga_0_vga_pRed 1 5 1 NJ 780
+preplace netloc rgb2vga_0_vga_pGreen 1 5 1 NJ 800
+preplace netloc rgb2vga_0_vga_pBlue 1 5 1 NJ 820
+preplace netloc rgb2vga_0_vga_pHSync 1 5 1 NJ 840
+preplace netloc rgb2vga_0_vga_pVSync 1 5 1 NJ 860
+preplace netloc axi_vdma_0_mm2s_introut 1 3 2 1170 440 NJ
+preplace netloc processing_system7_0_DDR 1 5 1 NJ 300
+preplace netloc processing_system7_0_FIXED_IO 1 5 1 NJ 320
+preplace netloc processing_system7_0_M_AXI_GP0 1 1 5 400 240 NJ 240 NJ 240 NJ 240 1990
+preplace netloc axi_smc_M00_AXI 1 2 1 680 80n
+preplace netloc axi_smc_M02_AXI 1 2 1 N 340
+preplace netloc axi_vdma_0_M_AXIS_MM2S 1 3 1 1180 120n
+preplace netloc v_tc_0_vtiming_out 1 3 1 N 630
+preplace netloc v_axi4s_vid_out_0_vid_io_out 1 4 1 1520 620n
+preplace netloc axi_vdma_0_M_AXI_MM2S 1 3 1 1150 60n
+preplace netloc axi_mem_intercon_M00_AXI 1 4 1 1510 120n
+preplace netloc axi_smc_M01_AXI 1 2 1 680 320n
+levelinfo -pg 1 0 210 540 940 1350 1760 2020
+pagesize -pg 1 -db -bbox -sgen 0 0 2150 920
+"
+}
+{
+   "da_axi4_cnt":"7",
+   "da_board_cnt":"3",
+   "da_clkrst_cnt":"2",
+   "da_ps7_cnt":"1"
+}

@@ -1,0 +1,85 @@
+# Definitional proc to organize widgets for parameters.
+proc init_gui { IPINST } {
+  ipgui::add_param $IPINST -name "Component_Name"
+  #Adding Page
+  set Page_0 [ipgui::add_page $IPINST -name "Page 0"]
+  ipgui::add_param $IPINST -name "P_VCO_FREQ_COUNT_DOWN" -parent ${Page_0}
+  ipgui::add_param $IPINST -name "P_VCO_FREQ_COUNT_UP" -parent ${Page_0}
+  ipgui::add_param $IPINST -name "P_VCO_FREQ_WAIT_TIME" -parent ${Page_0}
+  ipgui::add_param $IPINST -name "P_VCO_REG_COUNT" -parent ${Page_0}
+  ipgui::add_param $IPINST -name "P_VCO_REG_WAIT_TIME" -parent ${Page_0}
+
+
+}
+
+proc update_PARAM_VALUE.P_VCO_FREQ_COUNT_DOWN { PARAM_VALUE.P_VCO_FREQ_COUNT_DOWN } {
+	# Procedure called to update P_VCO_FREQ_COUNT_DOWN when any of the dependent parameters in the arguments change
+}
+
+proc validate_PARAM_VALUE.P_VCO_FREQ_COUNT_DOWN { PARAM_VALUE.P_VCO_FREQ_COUNT_DOWN } {
+	# Procedure called to validate P_VCO_FREQ_COUNT_DOWN
+	return true
+}
+
+proc update_PARAM_VALUE.P_VCO_FREQ_COUNT_UP { PARAM_VALUE.P_VCO_FREQ_COUNT_UP } {
+	# Procedure called to update P_VCO_FREQ_COUNT_UP when any of the dependent parameters in the arguments change
+}
+
+proc validate_PARAM_VALUE.P_VCO_FREQ_COUNT_UP { PARAM_VALUE.P_VCO_FREQ_COUNT_UP } {
+	# Procedure called to validate P_VCO_FREQ_COUNT_UP
+	return true
+}
+
+proc update_PARAM_VALUE.P_VCO_FREQ_WAIT_TIME { PARAM_VALUE.P_VCO_FREQ_WAIT_TIME } {
+	# Procedure called to update P_VCO_FREQ_WAIT_TIME when any of the dependent parameters in the arguments change
+}
+
+proc validate_PARAM_VALUE.P_VCO_FREQ_WAIT_TIME { PARAM_VALUE.P_VCO_FREQ_WAIT_TIME } {
+	# Procedure called to validate P_VCO_FREQ_WAIT_TIME
+	return true
+}
+
+proc update_PARAM_VALUE.P_VCO_REG_COUNT { PARAM_VALUE.P_VCO_REG_COUNT } {
+	# Procedure called to update P_VCO_REG_COUNT when any of the dependent parameters in the arguments change
+}
+
+proc validate_PARAM_VALUE.P_VCO_REG_COUNT { PARAM_VALUE.P_VCO_REG_COUNT } {
+	# Procedure called to validate P_VCO_REG_COUNT
+	return true
+}
+
+proc update_PARAM_VALUE.P_VCO_REG_WAIT_TIME { PARAM_VALUE.P_VCO_REG_WAIT_TIME } {
+	# Procedure called to update P_VCO_REG_WAIT_TIME when any of the dependent parameters in the arguments change
+}
+
+proc validate_PARAM_VALUE.P_VCO_REG_WAIT_TIME { PARAM_VALUE.P_VCO_REG_WAIT_TIME } {
+	# Procedure called to validate P_VCO_REG_WAIT_TIME
+	return true
+}
+
+
+proc update_MODELPARAM_VALUE.P_VCO_REG_COUNT { MODELPARAM_VALUE.P_VCO_REG_COUNT PARAM_VALUE.P_VCO_REG_COUNT } {
+	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
+	set_property value [get_property value ${PARAM_VALUE.P_VCO_REG_COUNT}] ${MODELPARAM_VALUE.P_VCO_REG_COUNT}
+}
+
+proc update_MODELPARAM_VALUE.P_VCO_FREQ_COUNT_DOWN { MODELPARAM_VALUE.P_VCO_FREQ_COUNT_DOWN PARAM_VALUE.P_VCO_FREQ_COUNT_DOWN } {
+	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
+	set_property value [get_property value ${PARAM_VALUE.P_VCO_FREQ_COUNT_DOWN}] ${MODELPARAM_VALUE.P_VCO_FREQ_COUNT_DOWN}
+}
+
+proc update_MODELPARAM_VALUE.P_VCO_FREQ_COUNT_UP { MODELPARAM_VALUE.P_VCO_FREQ_COUNT_UP PARAM_VALUE.P_VCO_FREQ_COUNT_UP } {
+	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
+	set_property value [get_property value ${PARAM_VALUE.P_VCO_FREQ_COUNT_UP}] ${MODELPARAM_VALUE.P_VCO_FREQ_COUNT_UP}
+}
+
+proc update_MODELPARAM_VALUE.P_VCO_REG_WAIT_TIME { MODELPARAM_VALUE.P_VCO_REG_WAIT_TIME PARAM_VALUE.P_VCO_REG_WAIT_TIME } {
+	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
+	set_property value [get_property value ${PARAM_VALUE.P_VCO_REG_WAIT_TIME}] ${MODELPARAM_VALUE.P_VCO_REG_WAIT_TIME}
+}
+
+proc update_MODELPARAM_VALUE.P_VCO_FREQ_WAIT_TIME { MODELPARAM_VALUE.P_VCO_FREQ_WAIT_TIME PARAM_VALUE.P_VCO_FREQ_WAIT_TIME } {
+	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
+	set_property value [get_property value ${PARAM_VALUE.P_VCO_FREQ_WAIT_TIME}] ${MODELPARAM_VALUE.P_VCO_FREQ_WAIT_TIME}
+}
+
