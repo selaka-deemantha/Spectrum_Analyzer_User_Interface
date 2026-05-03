@@ -3,7 +3,7 @@
 
 
 // Debug test
-#define TEST_MODE 1
+#define TEST_MODE 0
 #define DEBUG_MSG 0
 #define DMA_WRITE_FILE 0
 
